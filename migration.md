@@ -137,6 +137,17 @@ Using the file explorer, drag-and-drop the contents listed above from the existi
     }
     ```
 
+1. Add in the `Newtonsoft.Json` nuget package
+   ![Newtonsoft Json](./media/newtonsoft-json-nuget.png)
+
+1. Add in the `IdentityModel` nuget package
+   ![IdentityModel](./media/identitymodel-nuget.png)
+
+1. Add in the `PCLCrypto` nuget package
+   ![PCLCrypto](./media/pclcrypto-nuget.png)
+
+### Xamarin Community Toolkit Migration Steps
+
 1. Add in the `Maui Community Toolkit` nuget package
    ![MAUI Community Toolkit](./media/maui-community-toolkit-nuget.png)
 
@@ -170,9 +181,9 @@ Using the file explorer, drag-and-drop the contents listed above from the existi
             builder
                 .UseMauiApp<App>()
                 .ConfigureEffects(
-    				effects =>
-    				{
-    				})
+                    effects =>
+                    {
+                    })
                 .UseMauiCommunityToolkit()
                 .ConfigureFonts(
                     fonts =>
@@ -504,16 +515,7 @@ Using the file explorer, drag-and-drop the contents listed above from the existi
     </views:ContentPageBase>
     ```
 
-1. Add in the `Newtonsoft.Json` nuget package
-   ![Newtonsoft Json](./media/newtonsoft-json-nuget.png)
-
-1. Add in the `IdentityModel` nuget package
-   ![IdentityModel](./media/identitymodel-nuget.png)
-
-1. Add in the `PCLCrypto` nuget package
-   ![PCLCrypto](./media/pclcrypto-nuget.png)
-
-### Font Migration
+## Font Migration
 
 Font registration has been streamlined in Microsoft MAUI.
 
@@ -560,3 +562,13 @@ Font registration has been streamlined in Microsoft MAUI.
         }
     }
     ```
+
+## Image Migration
+
+In Xamarin.Forms, images would often times be registered on the individual platforms. In this application, we have existing images that we can migrate from the iOS, Android or UWP application. For this example,  I will be using images from the `eShopOnContainers\eShopOnContainers.Droid\Resources\drawable` folder.
+
+1. Copy the images from the existing Xamarin.Forms application over to the `Resources\Images` folder in your MAUI project.
+   ![Migrated Images](./media/migrated-images.png)
+
+1. Highlight all of the font files in the `Resources\Images` folder and set the `Build Action` to `MauiImage`
+    ![Build Action > MauiImage](./media/build-action-maui-image.png)
