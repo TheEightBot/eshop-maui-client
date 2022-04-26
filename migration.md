@@ -513,4 +513,50 @@ Using the file explorer, drag-and-drop the contents listed above from the existi
 1. Add in the `PCLCrypto` nuget package
    ![PCLCrypto](./media/pclcrypto-nuget.png)
 
+### Font Migration
 
+Font registration has been streamlined in Microsoft MAUI.
+
+1. Copy the fonts from the existing Xamarin.Forms application over to the `Resources\Fonts` folder in your MAUI project.
+   ![Migrated fonts](./media/migrated-fonts.png)
+
+1. Highlight all of the font files in the `Resources\Fonts` folder and set the `Build Action` to `MauiFont`
+    ![Build Action > MauiFont](./media/build-action-maui-font.png)
+
+1. Update `MauiProgram.cs` to include our migrated fonts
+
+    ```csharp
+    using CommunityToolkit.Maui;
+    
+    namespace eShopOnContainers;
+    
+    public static class MauiProgram
+    {
+        public static MauiApp CreateMauiApp()
+        {
+            var builder = MauiApp.CreateBuilder();
+            builder
+                .UseMauiApp<App>()
+                .ConfigureEffects(
+                    effects =>
+                    {
+                    })
+                .UseMauiCommunityToolkit()
+                .ConfigureFonts(
+                    fonts =>
+                    {
+                        fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+                        fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+    
+                        fonts.AddFont("Font_Awesome_5_Free-Regular-400.otf", "FontAwesome-Regular");
+                        fonts.AddFont("Font_Awesome_5_Free-Solid-900.otf", "FontAwesome-Solid");
+                        fonts.AddFont("Montserrat-Bold.ttf", "Montserrat-Bold");
+                        fonts.AddFont("Montserrat-Regular.ttf", "Montserrat-Regular");
+                        fonts.AddFont("SourceSansPro-Regular.ttf", "SourceSansPro-Regular");
+                        fonts.AddFont("SourceSansPro-Solid.ttf", "SourceSansPro-Solid");
+                    });
+    
+            return builder.Build();
+        }
+    }
+    ```
