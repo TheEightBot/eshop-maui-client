@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <views:ContentPageBase
     x:Class="eShopOnContainers.Views.OrderDetailView"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
@@ -107,14 +107,14 @@
                         Grid.Column="0"
                         Margin="12">
                         <Label Style="{StaticResource TitleStyle}" Text="ORDER NUMBER" />
-                        <Label Style="{StaticResource OrderContentStyle}" Text="{Binding Order.OrderNumber, Converter={StaticResource ToUpperConverter}}" />
+                        <Label Style="{StaticResource OrderContentStyle}" Text="{Binding Order.OrderNumber}" />
                     </StackLayout>
                     <StackLayout
                         Grid.Row="1"
                         Grid.Column="0"
                         Margin="12">
                         <Label Style="{StaticResource TitleStyle}" Text="TOTAL" />
-                        <Label Style="{StaticResource OrderContentStyle}" Text="{Binding Order.Total, StringFormat='${0:N}', Converter={StaticResource ToUpperConverter}}" />
+                        <Label Style="{StaticResource OrderContentStyle}" Text="{Binding Order.Total, StringFormat='${0:N}'}" />
                     </StackLayout>
                     <StackLayout
                         Grid.Row="0"
@@ -128,7 +128,7 @@
                         Grid.Column="1"
                         Margin="12">
                         <Label Style="{StaticResource TitleStyle}" Text="STATUS" />
-                        <Label Style="{StaticResource OrderContentStyle}" Text="{Binding OrderStatusText}" />
+                        <Label Style="{StaticResource OrderContentStyle}" Text="{Binding Order.OrderStatus, Converter={StaticResource OrderStatusToStringConverter}}" />
                     </StackLayout>
                 </Grid>
                 <!--  SHIPPING ADDRESS  -->

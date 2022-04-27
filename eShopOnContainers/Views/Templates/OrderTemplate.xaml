@@ -31,14 +31,14 @@
                 Grid.Column="0"
                 Margin="12">
                 <Label Style="{StaticResource OrderTitleStyle}" Text="ORDER NUMBER" />
-                <Label Text="{Binding OrderNumber, Converter={StaticResource ToUpperConverter}}" />
+                <Label Text="{Binding OrderNumber}" />
             </StackLayout>
             <StackLayout
                 Grid.Row="1"
                 Grid.Column="0"
                 Margin="12">
                 <Label Style="{StaticResource OrderTitleStyle}" Text="TOTAL" />
-                <Label Text="{Binding Total, StringFormat='${0:N}', Converter={StaticResource ToUpperConverter}}" />
+                <Label Text="{Binding Total, StringFormat='${0:N}'}" />
             </StackLayout>
             <StackLayout
                 Grid.Row="0"
@@ -52,7 +52,7 @@
                 Grid.Column="1"
                 Margin="12">
                 <Label Style="{StaticResource OrderTitleStyle}" Text="STATUS" />
-                <Label Text="{Binding OrderStatus, Converter={StaticResource ToUpperConverter}}" />
+                <Label Text="{Binding OrderStatus, Converter={StaticResource OrderStatusToStringConverter}}" />
             </StackLayout>
             <Grid
                 Grid.Row="2"
