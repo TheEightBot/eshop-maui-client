@@ -30,22 +30,26 @@ namespace eShopOnContainers.Services
                 return NavigateToAsync("//Main/Catalog");
         }
 
-        public Task NavigateToAsync (string route, IDictionary<string, string> routeParameters = null)
+        public Task NavigateToAsync (string route, IDictionary<string, object> routeParameters = null)
         {
-            var uri = new StringBuilder (route);
+            //var uri = new StringBuilder (route);
 
-            if (routeParameters != null)
-            {
-                uri.Append ('?');
+            //if (routeParameters != null)
+            //{
+            //    uri.Append ('?');
 
-                foreach (var routeParameter in routeParameters)
-                {
-                    uri.Append ($"{routeParameter.Key}={Uri.EscapeDataString (routeParameter.Value)}&");
-                }
-                uri.Remove (uri.Length - 1, 1);
-            }
+            //    foreach (var routeParameter in routeParameters)
+            //    {
+            //        uri.Append ($"{routeParameter.Key}={Uri.EscapeDataString (routeParameter.Value.ToString())}&");
+            //    }
+            //    uri.Remove (uri.Length - 1, 1);
+            //}
 
-            return Shell.Current.GoToAsync (uri.ToString ());
+            var shellNavigation = new ShellNavigationState(route);
+            return
+                routeParameters != null
+                    ? Shell.Current.GoToAsync(shellNavigation, routeParameters)
+                    : Shell.Current.GoToAsync(shellNavigation);
         }
 
         private Type GetPageTypeForViewModel(Type viewModelType)

@@ -8,6 +8,6 @@ namespace eShopOnContainers.Services
     {
         Task InitializeAsync();
 
-        Task NavigateToAsync (string route, IDictionary<string, string> routeParameters = null);
+        Task NavigateToAsync (string route, IDictionary<string, object> routeParameters = null);
     }
 }
