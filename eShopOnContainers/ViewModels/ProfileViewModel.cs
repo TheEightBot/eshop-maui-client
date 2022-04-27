@@ -72,7 +72,7 @@ namespace eShopOnContainers.ViewModels
             // Logout
             await NavigationService.NavigateToAsync(
                 "//Login",
-                new Dictionary<string, string> { { "Logout", true.ToString () } });
+                new Dictionary<string, object> { { "Logout", true } });
 
             IsBusy = false;
         }
@@ -81,7 +81,9 @@ namespace eShopOnContainers.ViewModels
         {
             await NavigationService.NavigateToAsync(
                 "OrderDetail",
-                new Dictionary<string, string> { { nameof (Order.OrderNumber), order.OrderNumber.ToString() } });
+                new Dictionary<string, object> {
+                    { nameof (Order.OrderNumber), order.OrderNumber } }
+                );
         }
     }
 }

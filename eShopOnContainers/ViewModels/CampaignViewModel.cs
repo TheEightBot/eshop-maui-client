@@ -47,7 +47,7 @@ namespace eShopOnContainers.ViewModels
         {
             await NavigationService.NavigateToAsync(
                 "CampaignDetails",
-                new Dictionary<string, string> { { nameof (Campaign.Id), campaign.Id.ToString () } });
+                new Dictionary<string, object> { { nameof (Campaign.Id), campaign.Id } });
         }
     }
 }

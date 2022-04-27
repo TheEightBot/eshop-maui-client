@@ -233,9 +233,9 @@ namespace eShopOnContainers.ViewModels
         {
             return NavigationService.NavigateToAsync(
                 "Settings",
-                new Dictionary<string, string>
+                new Dictionary<string, object>
                 {
-                    { "reset", "true" },
+                    { "reset", true },
                 });
         }
 
