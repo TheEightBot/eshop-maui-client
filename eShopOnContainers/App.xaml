@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <Application
     x:Class="eShopOnContainers.App"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
@@ -123,10 +123,16 @@
 
             <FontImageSource
                 x:Key="CatalogIconImageSource"
+                FontAutoScalingEnabled="True"
+                Size="22"
+                Color="{AppThemeBinding Dark={StaticResource DarkFontColor}, Light={StaticResource LightFontColor}}"
                 FontFamily="{StaticResource FontAwesomeSolid}"
                 Glyph="{StaticResource CatalogIcon}"/>
             <FontImageSource
                 x:Key="ProfileIconImageSource"
+                FontAutoScalingEnabled="True"
+                Size="22"
+                Color="{AppThemeBinding Dark={StaticResource DarkFontColor}, Light={StaticResource LightFontColor}}"
                 FontFamily="{StaticResource FontAwesomeSolid}"
                 Glyph="{StaticResource ProfileIcon}" />
             <FontImageSource
@@ -356,10 +362,8 @@
             <Style
                 ApplyToDerivedTypes="True"
                 CanCascade="True"
-                TargetType="ListView">
+                TargetType="CollectionView">
                 <Setter Property="BackgroundColor" Value="{StaticResource ThemeListViewBackgroundColor}" />
-                <Setter Property="SeparatorColor" Value="{StaticResource SeparatorLineColor}" />
-                <Setter Property="SeparatorVisibility" Value="Default" />
             </Style>
 
             <Style
