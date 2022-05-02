@@ -48,9 +48,9 @@
     <Grid ColumnSpacing="0" RowSpacing="0">
         <!--  CATALOG  -->
         <Label
-            HorizontalOptions="Center"
             IsVisible="{Binding Products, Converter={StaticResource ListIsNullOrEmptyConverter}}"
             Text="NO PRODUCTS FOUND"
+            HorizontalOptions="Center"
             VerticalOptions="Center" />
         <ListView
             x:Name="Products"
@@ -89,26 +89,20 @@
             </ActivityIndicator.WidthRequest>
         </ActivityIndicator>
 
-        <!--<mct:BadgeView
-            x:Name="ShoppingCart"
-            BackgroundColor="{AppThemeBinding Light={StaticResource DarkBackgroundColor}, Dark={StaticResource LightBackgroundColor}}"
-            TextColor="{AppThemeBinding Light={StaticResource DarkForegroundColor}, Dark={StaticResource LightForegroundColor}}"
-            BadgePosition="TopRight"
-            AutoHide="True"
-            FontSize="Micro"
+        <views:BadgeView
+            Padding="8"
+            Margin="16"
             Text="{Binding BadgeCount, Mode=OneWay}"
-            Padding="16,0"
-            Margin="0,0,16,16"
+            BadgeColor="{AppThemeBinding Light={StaticResource DarkBackgroundColor}, Dark={StaticResource LightBackgroundColor}}"
+            TextColor="{AppThemeBinding Light={StaticResource DarkForegroundColor}, Dark={StaticResource LightForegroundColor}}"
             HorizontalOptions="End"
             VerticalOptions="End">
-            <ImageButton
-                Source="{DynamicResource BasketIconForTitleImageSource}"
-                Command="{Binding ViewBasketCommand}"
-                BackgroundColor="{StaticResource LightGreenColor}"
-                Padding="16"
-                CornerRadius="8"
-                HorizontalOptions="Center"
-                VerticalOptions="Center"/>
-        </mct:BadgeView>-->
+                <ImageButton
+                    Source="{DynamicResource BasketIconForTitleImageSource}"
+                    Command="{Binding ViewBasketCommand}"
+                    BackgroundColor="{StaticResource LightGreenColor}"
+                    Padding="16"
+                    CornerRadius="8" />
+        </views:BadgeView>
     </Grid>
 </views:ContentPageBase>
