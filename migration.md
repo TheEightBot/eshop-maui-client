@@ -56,7 +56,6 @@ Using the file explorer, drag-and-drop the contents listed above from the existi
     | `xmlns:windows="clr-namespace:Xamarin.Forms.PlatformConfiguration.WindowsSpecific;assembly=Xamarin.Forms.Core"`| Replace with an empty string |
     | `` | `xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"` |
     | `windows:Application.ImageDirectory="Assets"`| Replace with an empty string |
-    | `xmlns:ffimageloading="clr-namespace:FFImageLoading.Forms;assembly=FFImageLoading.Forms"` | Replace with an empty string |
     | `using Xamarin.Forms` | `using Microsoft.Maui` |
     | `using Xamarin.Forms.Xaml` | `using Microsoft.Maui.Controls.Xaml` |
     | `using Xamarin.Essentials` | Replace with an empty string |
