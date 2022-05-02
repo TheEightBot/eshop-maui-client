@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <views:ContentPageBase
     x:Class="eShopOnContainers.Views.BasketView"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
@@ -37,6 +37,9 @@
         </ResourceDictionary>
     </ContentPage.Resources>
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
         <!--  SHOPPING CART  -->
         <Grid IsVisible="{Binding BasketItems, Converter={StaticResource ListIsNotNullOrEmptyConverter}}">
             <Grid.RowDefinitions>
@@ -44,47 +47,34 @@
                 <RowDefinition Height="60" />
             </Grid.RowDefinitions>
             <!--  CART ITEMS  -->
-            <ListView
-                CachingStrategy="RecycleElement"
-                HasUnevenRows="True"
-                HeightRequest="{Binding BasketItems.Count, Converter={StaticResource ItemsToHeightConverter}}"
+            <CollectionView
                 ItemsSource="{Binding BasketItems}"
-                SeparatorVisibility="None"
-                VerticalOptions="FillAndExpand"
+                SelectionChangedCommand="{Binding AddCommand}"
+                SelectionChangedCommandParameter="{Binding SelectedItem, Source={RelativeSource Self}}"
                 Grid.Row="0">
-                <ListView.Behaviors>
-                    <mct:EventToCommandBehavior
-                        Command="{Binding AddCommand}"
-                        EventArgsConverter="{StaticResource ItemTappedEventArgsConverter}"
-                        EventName="ItemTapped" />
-                </ListView.Behaviors>
-                <ListView.Header>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <templates:BasketItemTemplate />
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+                <CollectionView.Footer>
                     <!--  TOTAL  -->
-                    <StackLayout Orientation="Horizontal" Padding="8" Grid.Row="0">
+                    <HorizontalStackLayout Padding="8" Grid.Row="0">
                         <Label
                             Style="{StaticResource CartTotalStyle}"
                             Text="TOTAL"
                             TextColor="{AppThemeBinding Dark={StaticResource DarkFontColor}, Light={StaticResource LightFontColor}}"
-                            HorizontalTextAlignment="End"
-                            HorizontalOptions="FillAndExpand"
+                            HorizontalOptions="EndAndExpand"
                             VerticalOptions="CenterAndExpand" />
                         <Label
                             Style="{StaticResource CartTotalStyle}"
                             Text="{Binding Total, StringFormat='${0:N}'}"
                             TextColor="{StaticResource GreenColor}"
-                            HorizontalTextAlignment="Start"
-                            HorizontalOptions="FillAndExpand"
+                            HorizontalOptions="End"
                             VerticalOptions="CenterAndExpand" />
-                    </StackLayout>
-                </ListView.Header>
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <ViewCell>
-                            <templates:BasketItemTemplate />
-                        </ViewCell>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+                    </HorizontalStackLayout>
+                </CollectionView.Footer>
+            </CollectionView>
             <!--  CHECKOUT  -->
             <Grid
                 Grid.Row="1"

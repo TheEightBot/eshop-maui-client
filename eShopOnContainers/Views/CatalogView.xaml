@@ -16,12 +16,6 @@
     <ContentPage.Resources>
         <ResourceDictionary>
 
-            <Style x:Key="ProductsListStyle" TargetType="{x:Type ListView}">
-                <Setter Property="RowHeight" Value="400" />
-                <Setter Property="VerticalOptions" Value="Center" />
-                <Setter Property="Margin" Value="0" />
-            </Style>
-
             <Style x:Key="FilterLabelStyle" TargetType="{x:Type Label}">
                 <Setter Property="TextColor" Value="{StaticResource WhiteColor}" />
                 <Setter Property="HorizontalOptions" Value="Center" />
@@ -52,28 +46,20 @@
             Text="NO PRODUCTS FOUND"
             HorizontalOptions="Center"
             VerticalOptions="Center" />
-        <ListView
+        <CollectionView
             x:Name="Products"
-            CachingStrategy="RecycleElement"
             SelectedItem="{Binding SelectedProduct, Mode=TwoWay}"
             IsVisible="{Binding Products, Converter={StaticResource ListIsNotNullOrEmptyConverter}}"
             ItemsSource="{Binding Products}"
-            SeparatorVisibility="None"
-            Style="{StaticResource ProductsListStyle}">
-            <ListView.Behaviors>
-                <mct:EventToCommandBehavior
-                    Command="{Binding AddCatalogItemCommand}"
-                    EventArgsConverter="{StaticResource ItemTappedEventArgsConverter}"
-                    EventName="ItemTapped" />
-            </ListView.Behaviors>
-            <ListView.ItemTemplate>
+            SelectionMode="Single"
+            SelectionChangedCommand="{Binding AddCatalogItemCommand}"
+            SelectionChangedCommandParameter="{Binding SelectedItem, Source={RelativeSource Self}}">
+            <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <ViewCell>
-                        <templates:ProductTemplate />
-                    </ViewCell>
+                    <templates:ProductTemplate />
                 </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
         <!--  INDICATOR  -->
         <ActivityIndicator
             HorizontalOptions="Center"

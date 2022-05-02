@@ -45,6 +45,11 @@ namespace eShopOnContainers.ViewModels
 
         private async Task GetCampaignDetailsAsync(CampaignItem campaign)
         {
+            if(campaign is null)
+            {
+                return;
+            }
+
             await NavigationService.NavigateToAsync(
                 "CampaignDetails",
                 new Dictionary<string, object> { { nameof (Campaign.Id), campaign.Id } });

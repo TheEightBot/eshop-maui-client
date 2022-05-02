@@ -143,6 +143,11 @@ namespace eShopOnContainers.ViewModels
 
         private async void AddCatalogItem(CatalogItem catalogItem)
         {
+            if(catalogItem is null)
+            {
+                return;
+            }
+
             var authToken = _settingsService.AuthAccessToken;
             var userInfo = await _userService.GetUserInfoAsync (authToken);
             var basket = await _basketService.GetBasketAsync (userInfo.UserId, authToken);
@@ -161,6 +166,8 @@ namespace eShopOnContainers.ViewModels
                 await _basketService.UpdateBasketAsync (basket, authToken);
                 BadgeCount = basket.Items.Count ();
             }
+
+            SelectedProduct = null;
         }
 
         private async Task FilterAsync()

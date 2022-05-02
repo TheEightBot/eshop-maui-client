@@ -79,11 +79,14 @@ namespace eShopOnContainers.ViewModels
 
         private async Task OrderDetailAsync(Order order)
         {
+            if(order is null)
+            {
+                return;
+            }
+
             await NavigationService.NavigateToAsync(
                 "OrderDetail",
-                new Dictionary<string, object> {
-                    { nameof (Order.OrderNumber), order.OrderNumber } }
-                );
+                new Dictionary<string, object>{ { nameof (Order.OrderNumber), order.OrderNumber } });
         }
     }
 }

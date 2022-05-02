@@ -68,8 +68,8 @@ namespace eShopOnContainers.ViewModels
 
         public override async Task InitializeAsync (IDictionary<string, object> query)
         {
-            if (BasketItems == null)
-                BasketItems = new ObservableCollection<BasketItem> ();
+            if (_basketItems == null)
+                _basketItems = new ObservableCollection<BasketItem> ();
 
             var authToken = _settingsService.AuthAccessToken;
             var userInfo = await _userService.GetUserInfoAsync (authToken);
