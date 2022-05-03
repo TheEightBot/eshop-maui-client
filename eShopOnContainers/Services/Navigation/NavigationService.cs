@@ -52,6 +52,11 @@ namespace eShopOnContainers.Services
                     : Shell.Current.GoToAsync(shellNavigation);
         }
 
+        public async Task PopAsync()
+        {
+            await Shell.Current.GoToAsync("..");
+        }
+
         private Type GetPageTypeForViewModel(Type viewModelType)
         {
             var viewName = viewModelType.FullName.Replace("Model", string.Empty);

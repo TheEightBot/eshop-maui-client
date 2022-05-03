@@ -9,10 +9,12 @@ namespace eShopOnContainers.Views
 {
     public partial class CatalogView : ContentPageBase
     {
-        private FiltersView _filterView = new FiltersView();
+        private FiltersView _filtersView;
 
         public CatalogView()
         {
+            _filtersView = new FiltersView();
+
             InitializeComponent();
         }
 
@@ -20,12 +22,13 @@ namespace eShopOnContainers.Views
         {
             base.OnBindingContextChanged();
 
-            _filterView.BindingContext = BindingContext;
+            _filtersView.BindingContext = this.BindingContext;
         }
 
-        private void OnFilterChanged(object sender, EventArgs e)
+        private async void OnFilterChanged(object sender, EventArgs e)
         {
-            this.ShowPopup (_filterView);
+            //TODO: This can probably be adjusted
+            await this.Navigation.PushModalAsync(_filtersView, true);
         }
     }
 }
