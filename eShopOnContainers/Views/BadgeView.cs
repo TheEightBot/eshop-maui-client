@@ -1,5 +1,4 @@
 ﻿using System;
-using EventKitUI;
 using Microsoft.Maui.Controls.Shapes;
 
 namespace eShopOnContainers.Views
@@ -131,18 +130,17 @@ namespace eShopOnContainers.Views
 			base.OnChildAdded(child);
 		}
 
-        protected override void OnHandlerChanging(HandlerChangingEventArgs args)
-        {
-            base.OnHandlerChanging(args);
+		protected override void OnHandlerChanging(HandlerChangingEventArgs args)
+		{
+			base.OnHandlerChanging(args);
 
 			_border.SizeChanged -= BadgeIndicatorSizeChanged;
 
 			if (args.NewHandler is not null)
-            {
+			{
 				_border.SizeChanged += BadgeIndicatorSizeChanged;
-            }
-			
-        }
+			}
+		}
 
         private void BadgeIndicatorSizeChanged(object sender, EventArgs e)
         {
