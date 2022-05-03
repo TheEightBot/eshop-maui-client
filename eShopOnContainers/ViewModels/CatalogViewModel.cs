@@ -1,4 +1,4 @@
-﻿using eShopOnContainers.Models.Basket;
+using eShopOnContainers.Models.Basket;
 using eShopOnContainers.Models.Catalog;
 using eShopOnContainers.Services.Basket;
 using eShopOnContainers.Services.Catalog;
@@ -180,6 +180,8 @@ namespace eShopOnContainers.ViewModels
                 {
                     Products = await _catalogService.FilterAsync(Brand.Id, Type.Id);
                 }
+
+                await NavigationService.PopAsync();
             }
             finally
             {
@@ -189,13 +191,20 @@ namespace eShopOnContainers.ViewModels
 
         private async Task ClearFilterAsync()
         {
-            IsBusy = true;
+            try
+            {
+                IsBusy = true;
 
-            Brand = null;
-            Type = null;
-            Products = await _catalogService.GetCatalogAsync();
-
-            IsBusy = false;
+                Brand = null;
+                Type = null;
+                Products = await _catalogService.GetCatalogAsync();
+                 
+                await NavigationService.PopAsync(); 
+            }
+            finally
+            {
+                IsBusy = false;
+            }
         }
 
         private Task ViewBasket()
