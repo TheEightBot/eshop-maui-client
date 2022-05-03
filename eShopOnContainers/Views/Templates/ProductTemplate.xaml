@@ -1,9 +1,10 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+﻿<?xml version="1.0" encoding="UTF-8" ?>
 <ContentView
     x:Class="eShopOnContainers.Views.Templates.ProductTemplate"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:controls="clr-namespace:eShopOnContainers.Controls;assembly=eShopOnContainers">
+    xmlns:controls="clr-namespace:eShopOnContainers.Controls;assembly=eShopOnContainers"
+    HeightRequest="380">
     <ContentView.Resources>
         <ResourceDictionary>
 

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFrameworks>net6.0-android;net6.0-ios;net6.0-maccatalyst</TargetFrameworks>
@@ -102,7 +102,7 @@
 	  <None Remove="PCLCrypto" />
 	</ItemGroup>
 	<ItemGroup>
-	  <PackageReference Include="CommunityToolkit.Maui" Version="1.0.0-rc1" />
+	  <PackageReference Include="CommunityToolkit.Maui" Version="1.0.0-rc2" />
 	  <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
 	  <PackageReference Include="IdentityModel" Version="3.0.0" />
 	  <PackageReference Include="PCLCrypto" Version="2.1.40-alpha" />

@@ -136,6 +136,9 @@
                     <ColumnDefinition />
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="66" />
+                </Grid.RowDefinitions>
                 <StackLayout  
                   Grid.Column="0"
                   Orientation="Horizontal"

@@ -123,10 +123,16 @@
 
             <FontImageSource
                 x:Key="CatalogIconImageSource"
+                FontAutoScalingEnabled="True"
+                Size="22"
+                Color="{AppThemeBinding Dark={StaticResource DarkFontColor}, Light={StaticResource LightFontColor}}"
                 FontFamily="{StaticResource FontAwesomeSolid}"
                 Glyph="{StaticResource CatalogIcon}"/>
             <FontImageSource
                 x:Key="ProfileIconImageSource"
+                FontAutoScalingEnabled="True"
+                Size="22"
+                Color="{AppThemeBinding Dark={StaticResource DarkFontColor}, Light={StaticResource LightFontColor}}"
                 FontFamily="{StaticResource FontAwesomeSolid}"
                 Glyph="{StaticResource ProfileIcon}" />
             <FontImageSource
@@ -253,6 +259,7 @@
             <mct:IsListNullOrEmptyConverter  x:Key="ListIsNullOrEmptyConverter" />
             <mct:IsListNotNullOrEmptyConverter x:Key="ListIsNotNullOrEmptyConverter" />
             <converters:ItemsToHeightConverter x:Key="ItemsToHeightConverter" />
+            <converters:OrderStatusToStringConverter x:Key="OrderStatusToStringConverter" />
             <x:String x:Key="DateTimeFormat">{0:MMMM dd yyyy}</x:String>
 
             <!--  EXPLICIT STYLES  -->
@@ -355,10 +362,8 @@
             <Style
                 ApplyToDerivedTypes="True"
                 CanCascade="True"
-                TargetType="ListView">
+                TargetType="CollectionView">
                 <Setter Property="BackgroundColor" Value="{StaticResource ThemeListViewBackgroundColor}" />
-                <Setter Property="SeparatorColor" Value="{StaticResource SeparatorLineColor}" />
-                <Setter Property="SeparatorVisibility" Value="Default" />
             </Style>
 
             <Style

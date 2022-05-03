@@ -1,4 +1,4 @@
-﻿using eShopOnContainers.Models.Basket;
+using eShopOnContainers.Models.Basket;
 using eShopOnContainers.Models.Catalog;
 using eShopOnContainers.Services.Basket;
 using eShopOnContainers.Services.Catalog;
@@ -143,6 +143,11 @@ namespace eShopOnContainers.ViewModels
 
         private async void AddCatalogItem(CatalogItem catalogItem)
         {
+            if(catalogItem is null)
+            {
+                return;
+            }
+
             var authToken = _settingsService.AuthAccessToken;
             var userInfo = await _userService.GetUserInfoAsync (authToken);
             var basket = await _basketService.GetBasketAsync (userInfo.UserId, authToken);
@@ -161,6 +166,8 @@ namespace eShopOnContainers.ViewModels
                 await _basketService.UpdateBasketAsync (basket, authToken);
                 BadgeCount = basket.Items.Count ();
             }
+
+            SelectedProduct = null;
         }
 
         private async Task FilterAsync()
@@ -173,6 +180,8 @@ namespace eShopOnContainers.ViewModels
                 {
                     Products = await _catalogService.FilterAsync(Brand.Id, Type.Id);
                 }
+
+                await NavigationService.PopAsync();
             }
             finally
             {
@@ -182,13 +191,20 @@ namespace eShopOnContainers.ViewModels
 
         private async Task ClearFilterAsync()
         {
-            IsBusy = true;
+            try
+            {
+                IsBusy = true;
 
-            Brand = null;
-            Type = null;
-            Products = await _catalogService.GetCatalogAsync();
-
-            IsBusy = false;
+                Brand = null;
+                Type = null;
+                Products = await _catalogService.GetCatalogAsync();
+                 
+                await NavigationService.PopAsync(); 
+            }
+            finally
+            {
+                IsBusy = false;
+            }
         }
 
         private Task ViewBasket()

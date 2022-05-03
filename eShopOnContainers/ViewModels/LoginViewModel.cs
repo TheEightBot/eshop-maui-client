@@ -233,10 +233,7 @@ namespace eShopOnContainers.ViewModels
         {
             return NavigationService.NavigateToAsync(
                 "Settings",
-                new Dictionary<string, object>
-                {
-                    { "reset", true },
-                });
+                new Dictionary<string, object>{ { "reset", true } });
         }
 
         private bool Validate()

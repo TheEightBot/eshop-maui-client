@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <views:ContentPageBase
     x:Class="eShopOnContainers.Views.ProfileView"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
@@ -44,30 +44,23 @@
                 Text="NO ORDERS"
                 VerticalOptions="Center" />
         </Grid>
-        <ListView
-            CachingStrategy="RecycleElement"
-            HasUnevenRows="True"
+        <CollectionView
             SelectedItem="{Binding SelectedOrder, Mode=TwoWay}"
             ItemsSource="{Binding Orders}"
-            SeparatorVisibility="None">
-            <ListView.Behaviors>
-                <mct:EventToCommandBehavior
-                    Command="{Binding OrderDetailCommand}"
-                    EventArgsConverter="{StaticResource ItemTappedEventArgsConverter}"
-                    EventName="ItemTapped" />
-            </ListView.Behaviors>
-            <ListView.Header>
+            ItemSizingStrategy="MeasureAllItems"
+            SelectionMode="Single"
+            SelectionChangedCommand="{Binding OrderDetailCommand}"
+            SelectionChangedCommandParameter="{Binding SelectedItem, Source={RelativeSource Self}}">
+            <CollectionView.Header>
                 <Label
                     Style="{StaticResource MyOrdersLabelStyle}"
                     Text="MY ORDERS" />
-            </ListView.Header>
-            <ListView.ItemTemplate>
+            </CollectionView.Header>
+            <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <ViewCell>
-                        <templates:OrderTemplate />
-                    </ViewCell>
+                    <templates:OrderTemplate />
                 </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
     </Grid>
 </views:ContentPageBase>
