@@ -9,8 +9,9 @@ namespace eShopOnContainers.ViewModels.Base
 {
     public abstract class ViewModelBase : ExtendedBindableObject, IQueryAttributable
     {
-        protected readonly IDialogService DialogService;
-        protected readonly INavigationService NavigationService;
+        public IDialogService DialogService { get; private set; }
+        public INavigationService NavigationService { get; private set; }
+        public ISettingsService SettingsService { get; private set; }
 
         private bool _isInitialized;
 
@@ -51,16 +52,15 @@ namespace eShopOnContainers.ViewModels.Base
             }
         }
 
-        public ViewModelBase()
+        public ViewModelBase(IDialogService dialogService, INavigationService navigationService, ISettingsService settingsService)
         {
-            DialogService = ViewModelLocator.Resolve<IDialogService>();
-            NavigationService = ViewModelLocator.Resolve<INavigationService>();
+            DialogService = dialogService;
+            NavigationService = navigationService;
+            SettingsService = settingsService;
 
-            var settingsService = ViewModelLocator.Resolve<ISettingsService>();
-
-            GlobalSetting.Instance.BaseIdentityEndpoint = settingsService.IdentityEndpointBase;
-            GlobalSetting.Instance.BaseGatewayShoppingEndpoint = settingsService.GatewayShoppingEndpointBase;
-            GlobalSetting.Instance.BaseGatewayMarketingEndpoint = settingsService.GatewayMarketingEndpointBase;
+            GlobalSetting.Instance.BaseIdentityEndpoint = SettingsService.IdentityEndpointBase;
+            GlobalSetting.Instance.BaseGatewayShoppingEndpoint = SettingsService.GatewayShoppingEndpointBase;
+            GlobalSetting.Instance.BaseGatewayMarketingEndpoint = SettingsService.GatewayMarketingEndpointBase;
         }
 
         public virtual Task InitializeAsync (IDictionary<string, object> query)

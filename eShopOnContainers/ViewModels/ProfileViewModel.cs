@@ -9,6 +9,7 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Microsoft.Maui;
+using eShopOnContainers.Services;
 
 namespace eShopOnContainers.ViewModels
 {
@@ -19,12 +20,15 @@ namespace eShopOnContainers.ViewModels
         private ObservableCollection<Order> _orders;
         private Order _selectedOrder;
 
-        public ProfileViewModel()
+        public ProfileViewModel(
+            IOrderService orderService,
+            IDialogService dialogService, INavigationService navigationService, ISettingsService settingsService)
+            : base(dialogService, navigationService, settingsService)
         {
             this.MultipleInitialization = true;
 
-            _settingsService = DependencyService.Get<ISettingsService> ();
-            _orderService = DependencyService.Get<IOrderService> ();
+            _orderService = orderService;
+            _settingsService = settingsService;
         }
 
         public ObservableCollection<Order> Orders

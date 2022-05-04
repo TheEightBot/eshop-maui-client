@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Microsoft.Maui;
+using eShopOnContainers.Services;
 
 namespace eShopOnContainers.ViewModels
 {
@@ -23,11 +24,14 @@ namespace eShopOnContainers.ViewModels
         private ISettingsService _settingsService;
         private IUserService _userService;
 
-        public BasketViewModel()
+        public BasketViewModel(
+            IBasketService basketService, IUserService userService,
+            IDialogService dialogService, INavigationService navigationService, ISettingsService settingsService)
+            : base(dialogService, navigationService, settingsService)
         {
-            _basketService = DependencyService.Get<IBasketService> ();
-            _settingsService = DependencyService.Get<ISettingsService>();
-            _userService = DependencyService.Get<IUserService> ();
+            _basketService = basketService;
+            _userService = userService;
+            _settingsService = settingsService;
         }
 
         public int BadgeCount

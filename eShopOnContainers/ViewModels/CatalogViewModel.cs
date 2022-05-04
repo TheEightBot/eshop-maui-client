@@ -1,4 +1,4 @@
-using eShopOnContainers.Models.Basket;
+﻿using eShopOnContainers.Models.Basket;
 using eShopOnContainers.Models.Catalog;
 using eShopOnContainers.Services.Basket;
 using eShopOnContainers.Services.Catalog;
@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Microsoft.Maui;
+using eShopOnContainers.Services;
 
 namespace eShopOnContainers.ViewModels
 {
@@ -28,14 +29,17 @@ namespace eShopOnContainers.ViewModels
         private ISettingsService _settingsService;
         private IUserService _userService;
 
-        public CatalogViewModel()
+        public CatalogViewModel(
+            IBasketService basketService, ICatalogService catalogService, IUserService userService,
+            IDialogService dialogService, INavigationService navigationService, ISettingsService settingsService)
+            : base(dialogService, navigationService, settingsService)
         {
             this.MultipleInitialization = true;
 
-            _catalogService = DependencyService.Get<ICatalogService> ();
-            _basketService = DependencyService.Get<IBasketService> ();
-            _settingsService = DependencyService.Get<ISettingsService> ();
-            _userService = DependencyService.Get<IUserService> ();
+            _basketService = basketService;
+            _catalogService = catalogService;
+            _userService = userService;
+            _settingsService = settingsService;
         }
 
         public ObservableCollection<CatalogItem> Products

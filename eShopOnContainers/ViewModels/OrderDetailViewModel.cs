@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Microsoft.Maui;
+using eShopOnContainers.Services;
 
 namespace eShopOnContainers.ViewModels
 {
@@ -19,10 +20,13 @@ namespace eShopOnContainers.ViewModels
         private bool _isSubmittedOrder;
         private string _orderStatusText;
 
-        public OrderDetailViewModel()
+        public OrderDetailViewModel(
+            IOrderService orderService,
+            IDialogService dialogService, INavigationService navigationService, ISettingsService settingsService)
+            : base(dialogService, navigationService, settingsService)
         {
-            _settingsService = DependencyService.Get<ISettingsService> ();
-            _orderService = DependencyService.Get<IOrderService> ();
+            _orderService = orderService;
+            _settingsService = settingsService;
         }
 
         public Order Order

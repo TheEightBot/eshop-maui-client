@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Microsoft.Maui;
+using eShopOnContainers.Services;
 
 namespace eShopOnContainers.ViewModels
 {
@@ -20,10 +21,13 @@ namespace eShopOnContainers.ViewModels
 
         public ICommand EnableDetailsSiteCommand => new Command(EnableDetailsSite);
 
-        public CampaignDetailsViewModel()
+        public CampaignDetailsViewModel(
+            ICampaignService campaignService,
+            IDialogService dialogService, INavigationService navigationService, ISettingsService settingsService)
+            : base(dialogService, navigationService, settingsService)
         {
-            _settingsService = DependencyService.Get<ISettingsService> ();
-            _campaignService = DependencyService.Get<ICampaignService> ();
+            _campaignService = campaignService;
+            _settingsService = settingsService;
         }
 
         public CampaignItem Campaign

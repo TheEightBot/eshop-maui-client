@@ -9,12 +9,10 @@ namespace eShopOnContainers
 {
     public partial class AppShell : Shell
     {
-        public AppShell ()
+        public AppShell (ISettingsService settingsService)
         {
             InitializeRouting ();
             InitializeComponent ();
-
-            var settingsService = ViewModelLocator.Resolve<ISettingsService> ();
 
             if (string.IsNullOrEmpty (settingsService.AuthAccessToken))
             {
