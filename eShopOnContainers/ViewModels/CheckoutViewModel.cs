@@ -13,6 +13,7 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Microsoft.Maui;
+using eShopOnContainers.Services;
 
 namespace eShopOnContainers.ViewModels
 {
@@ -22,17 +23,25 @@ namespace eShopOnContainers.ViewModels
         private Order _order;
         private Address _shippingAddress;
 
-        private ISettingsService _settingsService;
-        private IBasketService _basketService;
-        private IOrderService _orderService;
-        private IUserService _userService;
+        private readonly ISettingsService _settingsService;
+        private readonly IBasketService _basketService;
+        private readonly IOrderService _orderService;
+        private readonly IUserService _userService;
 
-        public CheckoutViewModel()
+        private readonly BasketViewModel _basketViewModel;
+
+        public CheckoutViewModel(
+            IBasketService basketService, IOrderService orderService, IUserService userService,
+            IDialogService dialogService, INavigationService navigationService, ISettingsService settingsService,
+            BasketViewModel basketViewModel)
+            : base(dialogService, navigationService, settingsService)
         {
-            _settingsService = DependencyService.Get<ISettingsService> ();
-            _basketService = DependencyService.Get<IBasketService> ();
-            _orderService = DependencyService.Get<IOrderService> ();
-            _userService = DependencyService.Get<IUserService> ();
+            _basketService = basketService;
+            _orderService = orderService;
+            _userService = userService;
+            _settingsService = settingsService;
+
+            _basketViewModel = basketViewModel;
         }
 
         public ObservableCollection<BasketItem> OrderItems
@@ -153,8 +162,7 @@ namespace eShopOnContainers.ViewModels
                 await _basketService.ClearBasketAsync(_shippingAddress.Id.ToString(), authToken);
 
                 // Reset Basket badge
-                var basketViewModel = ViewModelLocator.Resolve<BasketViewModel>();
-                basketViewModel.BadgeCount = 0;
+                _basketViewModel.BadgeCount = 0;
 
                 // Navigate to Orders
                 await NavigationService.NavigateToAsync("//Main/Catalog");

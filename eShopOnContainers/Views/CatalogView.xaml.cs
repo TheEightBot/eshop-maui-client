@@ -11,18 +11,17 @@ namespace eShopOnContainers.Views
     {
         private FiltersView _filtersView;
 
-        public CatalogView()
+        public CatalogView(CatalogViewModel viewModel)
         {
-            _filtersView = new FiltersView();
+            this.BindingContext = viewModel;
+
+            _filtersView =
+                new FiltersView
+                {
+                    BindingContext = viewModel,
+                };
 
             InitializeComponent();
-        }
-
-        protected override void OnBindingContextChanged()
-        {
-            base.OnBindingContextChanged();
-
-            _filtersView.BindingContext = this.BindingContext;
         }
 
         private async void OnFilterChanged(object sender, EventArgs e)

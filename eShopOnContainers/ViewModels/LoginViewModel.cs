@@ -12,6 +12,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Microsoft.Maui;
+using eShopOnContainers.Services;
 
 namespace eShopOnContainers.ViewModels
 {
@@ -28,11 +29,14 @@ namespace eShopOnContainers.ViewModels
         private IOpenUrlService _openUrlService;
         private IIdentityService _identityService;
 
-        public LoginViewModel()
+        public LoginViewModel(
+            IOpenUrlService openUrlService, IIdentityService identityService,
+            IDialogService dialogService, INavigationService navigationService, ISettingsService settingsService)
+            : base(dialogService, navigationService, settingsService)
         {
-            _settingsService = DependencyService.Get<ISettingsService> ();
-            _openUrlService = DependencyService.Get<IOpenUrlService> ();
-            _identityService = DependencyService.Get<IIdentityService> ();
+            _settingsService = settingsService;
+            _openUrlService = openUrlService;
+            _identityService = identityService;
 
             _userName = new ValidatableObject<string>();
             _password = new ValidatableObject<string>();

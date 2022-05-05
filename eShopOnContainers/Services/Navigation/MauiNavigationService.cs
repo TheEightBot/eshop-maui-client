@@ -13,11 +13,11 @@ using Microsoft.Maui;
 
 namespace eShopOnContainers.Services
 {
-    public class NavigationService : INavigationService
+    public class MauiNavigationService : INavigationService
     {
         private readonly ISettingsService _settingsService;
 
-        public NavigationService(ISettingsService settingsService)
+        public MauiNavigationService(ISettingsService settingsService)
         {
             _settingsService = settingsService;
         }

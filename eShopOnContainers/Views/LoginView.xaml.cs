@@ -11,8 +11,9 @@ namespace eShopOnContainers.Views
     {
         private bool _animate;
 
-        public LoginView()
+        public LoginView(LoginViewModel viewModel)
         {
+            BindingContext = viewModel;
             InitializeComponent();
         }
 

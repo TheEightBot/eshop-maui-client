@@ -11,33 +11,45 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.Maui;
+using eShopOnContainers.Services.AppEnvironment;
 
 namespace eShopOnContainers
 {
     public partial class App : Application
     {
-        ISettingsService _settingsService;
+        private readonly ISettingsService _settingsService;
+        private readonly IAppEnvironmentService _appEnvironmentService;
+        private readonly INavigationService _navigationService;
+        private readonly ILocationService _locationService;
+        private readonly ITheme _theme;
 
-        public App()
+        public App(
+            ISettingsService settingsService, IAppEnvironmentService appEnvironmentService,
+            INavigationService navigationService, ILocationService locationService,
+            ITheme theme)
         {
+            _settingsService = settingsService;
+            _appEnvironmentService = appEnvironmentService;
+            _navigationService = navigationService;
+            _locationService = locationService;
+            _theme = theme;
+
             InitializeComponent();
 
             InitApp();
 
-            MainPage = new AppShell ();
+            MainPage = new AppShell (settingsService);
         }
 
         private void InitApp()
         {
-            _settingsService = ViewModelLocator.Resolve<ISettingsService>();
             if (!_settingsService.UseMocks)
-                ViewModelLocator.UpdateDependencies(_settingsService.UseMocks);
+                _appEnvironmentService.UpdateDependencies(_settingsService.UseMocks);
         }
 
         private Task InitNavigation()
         {
-            var navigationService = ViewModelLocator.Resolve<INavigationService>();
-            return navigationService.InitializeAsync();
+            return _navigationService.InitializeAsync();
         }
 
         protected override async void OnStart()
@@ -80,10 +92,9 @@ namespace eShopOnContainers
         {
             var nav = Current.MainPage as NavigationPage;
 
-            var e = DependencyService.Get<ITheme>();
             if (Current.RequestedTheme == AppTheme.Dark)
             {
-                e?.SetStatusBarColor(Colors.Black, false);
+                _theme?.SetStatusBarColor(Colors.Black, false);
                 if (nav != null)
                 {
                     nav.BarBackgroundColor = Colors.Black;
@@ -92,7 +103,7 @@ namespace eShopOnContainers
             }
             else
             {
-                e?.SetStatusBarColor(Colors.White, true);
+                _theme?.SetStatusBarColor(Colors.White, true);
                 if (nav != null)
                 {
                     nav.BarBackgroundColor = Colors.White;
@@ -134,8 +145,7 @@ namespace eShopOnContainers
                 Longitude = double.Parse(_settingsService.Longitude, CultureInfo.InvariantCulture)
             };
 
-            var locationService = ViewModelLocator.Resolve<ILocationService>();
-            await locationService.UpdateUserLocation(location, _settingsService.AuthAccessToken);
+            await _locationService.UpdateUserLocation(location, _settingsService.AuthAccessToken);
         }
     }
 }

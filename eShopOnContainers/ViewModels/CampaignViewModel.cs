@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Microsoft.Maui;
+using eShopOnContainers.Services;
 
 namespace eShopOnContainers.ViewModels
 {
@@ -17,10 +18,13 @@ namespace eShopOnContainers.ViewModels
 
         private ObservableCollection<CampaignItem> _campaigns;
 
-        public CampaignViewModel()
+        public CampaignViewModel(
+            ICampaignService campaignService,
+            IDialogService dialogService, INavigationService navigationService, ISettingsService settingsService)
+            : base(dialogService, navigationService, settingsService)
         {
-            _settingsService = DependencyService.Get<ISettingsService> ();
-            _campaignService = DependencyService.Get<ICampaignService> ();
+            _campaignService = campaignService;
+            _settingsService = settingsService;
         }
 
         public ObservableCollection<CampaignItem> Campaigns

@@ -7,9 +7,10 @@ using System.Globalization;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Microsoft.Maui;
-using eShopOnContainers.Services.Dependency;
 
 using System.Runtime.CompilerServices;
+using eShopOnContainers.Services.AppEnvironment;
+using eShopOnContainers.Services;
 
 namespace eShopOnContainers.ViewModels
 {
@@ -27,11 +28,16 @@ namespace eShopOnContainers.ViewModels
 
         private readonly ISettingsService _settingsService;
         private readonly ILocationService _locationService;
+        private readonly IAppEnvironmentService _appEnvironmentService;
 
-        public SettingsViewModel()
+        public SettingsViewModel(
+            ILocationService locationService, IAppEnvironmentService appEnvironmentService,
+            IDialogService dialogService, INavigationService navigationService, ISettingsService settingsService)
+            : base(dialogService, navigationService, settingsService)
         {
-            _settingsService = Microsoft.Maui.Controls.DependencyService.Get<ISettingsService> ();
-            _locationService = Microsoft.Maui.Controls.DependencyService.Get<ILocationService> ();
+            _settingsService = settingsService;
+            _locationService = locationService;
+            _appEnvironmentService = appEnvironmentService;
 
             _useAzureServices = !_settingsService.UseMocks;
             _identityEndpoint = _settingsService.IdentityEndpointBase;
@@ -217,7 +223,7 @@ namespace eShopOnContainers.ViewModels
 
         private async Task ToggleMockServicesAsync()
         {
-            ViewModelLocator.UpdateDependencies(!UseAzureServices);
+            _appEnvironmentService.UpdateDependencies(!UseAzureServices);
             RaisePropertyChanged(() => TitleUseAzureServices);
             RaisePropertyChanged(() => DescriptionUseAzureServices);
 
@@ -231,7 +237,7 @@ namespace eShopOnContainers.ViewModels
 
         private void ToggleFakeLocationAsync()
         {
-            ViewModelLocator.UpdateDependencies(!UseAzureServices);
+            _appEnvironmentService.UpdateDependencies(!UseAzureServices);
             RaisePropertyChanged(() => TitleUseFakeLocation);
             RaisePropertyChanged(() => DescriptionUseFakeLocation);
         }

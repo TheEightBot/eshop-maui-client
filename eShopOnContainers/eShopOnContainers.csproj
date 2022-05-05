@@ -100,11 +100,15 @@
 	  <None Remove="Newtonsoft.Json" />
 	  <None Remove="IdentityModel" />
 	  <None Remove="PCLCrypto" />
+	  <None Remove="Services\AppEnvironment\" />
 	</ItemGroup>
 	<ItemGroup>
 	  <PackageReference Include="CommunityToolkit.Maui" Version="1.0.0-rc2" />
 	  <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
 	  <PackageReference Include="IdentityModel" Version="3.0.0" />
 	  <PackageReference Include="PCLCrypto" Version="2.1.40-alpha" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Services\AppEnvironment\" />
 	</ItemGroup>
 </Project>
