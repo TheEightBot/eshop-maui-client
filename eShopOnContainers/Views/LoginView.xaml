@@ -194,7 +194,7 @@
                     <Entry.Behaviors>
 						<mct:EventToCommandBehavior
 							EventName="TextChanged"
-							Command="{Binding ValidateUserNameCommand}" />
+							Command="{Binding ValidateCommand}" />
 					</Entry.Behaviors>
 					<Entry.Triggers>
 						<DataTrigger 
@@ -223,7 +223,7 @@
 					<Entry.Behaviors>
 						<mct:EventToCommandBehavior
 							EventName="TextChanged"
-							Command="{Binding ValidatePasswordCommand}" />
+							Command="{Binding ValidateCommand}" />
 					</Entry.Behaviors>
 					<Entry.Triggers>
 						<DataTrigger 
