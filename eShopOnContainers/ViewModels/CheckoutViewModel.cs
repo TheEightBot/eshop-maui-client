@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Microsoft.Maui;
 using eShopOnContainers.Services;
+using eShopOnContainers.Services.AppEnvironment;
 
 namespace eShopOnContainers.ViewModels
 {
@@ -24,21 +25,17 @@ namespace eShopOnContainers.ViewModels
         private Address _shippingAddress;
 
         private readonly ISettingsService _settingsService;
-        private readonly IBasketService _basketService;
-        private readonly IOrderService _orderService;
-        private readonly IUserService _userService;
+        private readonly IAppEnvironmentService _appEnvironmentService;
 
         private readonly BasketViewModel _basketViewModel;
 
         public CheckoutViewModel(
-            IBasketService basketService, IOrderService orderService, IUserService userService,
+            IAppEnvironmentService appEnvironmentService,
             IDialogService dialogService, INavigationService navigationService, ISettingsService settingsService,
             BasketViewModel basketViewModel)
             : base(dialogService, navigationService, settingsService)
         {
-            _basketService = basketService;
-            _orderService = orderService;
-            _userService = userService;
+            _appEnvironmentService = appEnvironmentService;
             _settingsService = settingsService;
 
             _basketViewModel = basketViewModel;
@@ -80,11 +77,11 @@ namespace eShopOnContainers.ViewModels
         {
             IsBusy = true;
 
-            var basketItems = _basketService.LocalBasketItems;
+            var basketItems = _appEnvironmentService.BasketService.LocalBasketItems;
             OrderItems = new ObservableCollection<BasketItem>(basketItems);
 
             var authToken = _settingsService.AuthAccessToken;
-            var userInfo = await _userService.GetUserInfoAsync (authToken);
+            var userInfo = await _appEnvironmentService.UserService.GetUserInfoAsync (authToken);
 
             // Create Shipping Address
             ShippingAddress = new Address
@@ -131,7 +128,7 @@ namespace eShopOnContainers.ViewModels
             if (_settingsService.UseMocks)
             {
                 // Get number of orders
-                var orders = await _orderService.GetOrdersAsync (authToken);
+                var orders = await _appEnvironmentService.OrderService.GetOrdersAsync (authToken);
 
                 // Create the OrderNumber
                 Order.OrderNumber = orders.Count + 1;
@@ -147,19 +144,19 @@ namespace eShopOnContainers.ViewModels
             {
                 var authToken = _settingsService.AuthAccessToken;
 
-                var basket = _orderService.MapOrderToBasket(Order);
+                var basket = _appEnvironmentService.OrderService.MapOrderToBasket(Order);
                 basket.RequestId = Guid.NewGuid();
 
                 // Create basket checkout
-                await _basketService.CheckoutAsync(basket, authToken);
+                await _appEnvironmentService.BasketService.CheckoutAsync(basket, authToken);
 
                 if (_settingsService.UseMocks)
                 {
-                    await _orderService.CreateOrderAsync(Order, authToken);
+                    await _appEnvironmentService.OrderService.CreateOrderAsync(Order, authToken);
                 }
 
                 // Clean Basket
-                await _basketService.ClearBasketAsync(_shippingAddress.Id.ToString(), authToken);
+                await _appEnvironmentService.BasketService.ClearBasketAsync(_shippingAddress.Id.ToString(), authToken);
 
                 // Reset Basket badge
                 _basketViewModel.BadgeCount = 0;

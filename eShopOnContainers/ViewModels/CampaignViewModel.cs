@@ -8,22 +8,23 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Microsoft.Maui;
 using eShopOnContainers.Services;
+using eShopOnContainers.Services.AppEnvironment;
 
 namespace eShopOnContainers.ViewModels
 {
     public class CampaignViewModel : ViewModelBase
     {
         private readonly ISettingsService _settingsService;
-        private readonly ICampaignService _campaignService;
+        private readonly IAppEnvironmentService _appEnvironmentService;
 
         private ObservableCollection<CampaignItem> _campaigns;
 
         public CampaignViewModel(
-            ICampaignService campaignService,
+            IAppEnvironmentService appEnvironmentService,
             IDialogService dialogService, INavigationService navigationService, ISettingsService settingsService)
             : base(dialogService, navigationService, settingsService)
         {
-            _campaignService = campaignService;
+            _appEnvironmentService = appEnvironmentService;
             _settingsService = settingsService;
         }
 
@@ -43,7 +44,7 @@ namespace eShopOnContainers.ViewModels
         {
             IsBusy = true;
             // Get campaigns by user
-            Campaigns = await _campaignService.GetAllCampaignsAsync (_settingsService.AuthAccessToken);
+            Campaigns = await _appEnvironmentService.CampaignService.GetAllCampaignsAsync (_settingsService.AuthAccessToken);
             IsBusy = false;
         }
 

@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Microsoft.Maui;
 using eShopOnContainers.Services;
+using eShopOnContainers.Services.AppEnvironment;
 
 namespace eShopOnContainers.ViewModels
 {
@@ -24,21 +25,17 @@ namespace eShopOnContainers.ViewModels
         private ObservableCollection<CatalogType> _types;
         private CatalogType _type;
         private int _badgeCount;
-        private ICatalogService _catalogService;
-        private IBasketService _basketService;
+        private IAppEnvironmentService _appEnvironmentService;
         private ISettingsService _settingsService;
-        private IUserService _userService;
 
         public CatalogViewModel(
-            IBasketService basketService, ICatalogService catalogService, IUserService userService,
+            IAppEnvironmentService appEnvironmentService,
             IDialogService dialogService, INavigationService navigationService, ISettingsService settingsService)
             : base(dialogService, navigationService, settingsService)
         {
             this.MultipleInitialization = true;
 
-            _basketService = basketService;
-            _catalogService = catalogService;
-            _userService = userService;
+            _appEnvironmentService = appEnvironmentService;
             _settingsService = settingsService;
         }
 
@@ -131,14 +128,14 @@ namespace eShopOnContainers.ViewModels
             IsBusy = true;
 
             // Get Catalog, Brands and Types
-            Products = await _catalogService.GetCatalogAsync ();
-            Brands = await _catalogService.GetCatalogBrandAsync ();
-            Types = await _catalogService.GetCatalogTypeAsync ();
+            Products = await _appEnvironmentService.CatalogService.GetCatalogAsync ();
+            Brands = await _appEnvironmentService.CatalogService.GetCatalogBrandAsync ();
+            Types = await _appEnvironmentService.CatalogService.GetCatalogTypeAsync ();
 
             var authToken = _settingsService.AuthAccessToken;
-            var userInfo = await _userService.GetUserInfoAsync (authToken);
+            var userInfo = await _appEnvironmentService.UserService.GetUserInfoAsync (authToken);
 
-            var basket = await _basketService.GetBasketAsync (userInfo.UserId, authToken);
+            var basket = await _appEnvironmentService.BasketService.GetBasketAsync (userInfo.UserId, authToken);
 
             BadgeCount = basket?.Items?.Count () ?? 0;
 
@@ -153,8 +150,8 @@ namespace eShopOnContainers.ViewModels
             }
 
             var authToken = _settingsService.AuthAccessToken;
-            var userInfo = await _userService.GetUserInfoAsync (authToken);
-            var basket = await _basketService.GetBasketAsync (userInfo.UserId, authToken);
+            var userInfo = await _appEnvironmentService.UserService.GetUserInfoAsync (authToken);
+            var basket = await _appEnvironmentService.BasketService.GetBasketAsync (userInfo.UserId, authToken);
             if(basket != null)
             {
                 basket.Items.Add (
@@ -167,7 +164,7 @@ namespace eShopOnContainers.ViewModels
                         Quantity = 1
                     });
 
-                await _basketService.UpdateBasketAsync (basket, authToken);
+                await _appEnvironmentService.BasketService.UpdateBasketAsync (basket, authToken);
                 BadgeCount = basket.Items.Count ();
             }
 
@@ -182,7 +179,7 @@ namespace eShopOnContainers.ViewModels
 
                 if (Brand != null && Type != null)
                 {
-                    Products = await _catalogService.FilterAsync(Brand.Id, Type.Id);
+                    Products = await _appEnvironmentService.CatalogService.FilterAsync(Brand.Id, Type.Id);
                 }
 
                 await NavigationService.PopAsync();
@@ -201,7 +198,7 @@ namespace eShopOnContainers.ViewModels
 
                 Brand = null;
                 Type = null;
-                Products = await _catalogService.GetCatalogAsync();
+                Products = await _appEnvironmentService.CatalogService.GetCatalogAsync();
                  
                 await NavigationService.PopAsync(); 
             }
