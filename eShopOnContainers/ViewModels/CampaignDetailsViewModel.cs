@@ -8,13 +8,14 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Microsoft.Maui;
 using eShopOnContainers.Services;
+using eShopOnContainers.Services.AppEnvironment;
 
 namespace eShopOnContainers.ViewModels
 {
     public class CampaignDetailsViewModel : ViewModelBase
     {
         private readonly ISettingsService _settingsService;
-        private readonly ICampaignService _campaignService;
+        private readonly IAppEnvironmentService _appEnvironmentService;
 
         private CampaignItem _campaign;
         private bool _isDetailsSite;
@@ -22,11 +23,11 @@ namespace eShopOnContainers.ViewModels
         public ICommand EnableDetailsSiteCommand => new Command(EnableDetailsSite);
 
         public CampaignDetailsViewModel(
-            ICampaignService campaignService,
+            IAppEnvironmentService appEnvironmentService,
             IDialogService dialogService, INavigationService navigationService, ISettingsService settingsService)
             : base(dialogService, navigationService, settingsService)
         {
-            _campaignService = campaignService;
+            _appEnvironmentService = appEnvironmentService;
             _settingsService = settingsService;
         }
 
@@ -58,7 +59,7 @@ namespace eShopOnContainers.ViewModels
             {
                 IsBusy = true;
                 // Get campaign by id
-                Campaign = await _campaignService.GetCampaignByIdAsync(campaignId.Value, _settingsService.AuthAccessToken);
+                Campaign = await _appEnvironmentService.CampaignService.GetCampaignByIdAsync(campaignId.Value, _settingsService.AuthAccessToken);
                 IsBusy = false;
             }
         }

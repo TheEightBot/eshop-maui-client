@@ -43,8 +43,15 @@ namespace eShopOnContainers
 
         private void InitApp()
         {
+            if (VersionTracking.IsFirstLaunchEver)
+            {
+                _settingsService.UseMocks = true;
+            }
+
             if (!_settingsService.UseMocks)
+            {
                 _appEnvironmentService.UpdateDependencies(_settingsService.UseMocks);
+            }
         }
 
         private Task InitNavigation()

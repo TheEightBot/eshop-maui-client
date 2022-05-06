@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Microsoft.Maui;
 using eShopOnContainers.Services;
+using eShopOnContainers.Services.AppEnvironment;
 
 namespace eShopOnContainers.ViewModels
 {
@@ -20,17 +21,15 @@ namespace eShopOnContainers.ViewModels
         private ObservableCollection<BasketItem> _basketItems;
         private decimal _total;
 
-        private IBasketService _basketService;
+        private IAppEnvironmentService _appEnvironmentService;
         private ISettingsService _settingsService;
-        private IUserService _userService;
 
         public BasketViewModel(
-            IBasketService basketService, IUserService userService,
+            IAppEnvironmentService appEnvironmentService,
             IDialogService dialogService, INavigationService navigationService, ISettingsService settingsService)
             : base(dialogService, navigationService, settingsService)
         {
-            _basketService = basketService;
-            _userService = userService;
+            _appEnvironmentService = appEnvironmentService;
             _settingsService = settingsService;
         }
 
@@ -76,10 +75,10 @@ namespace eShopOnContainers.ViewModels
                 _basketItems = new ObservableCollection<BasketItem> ();
 
             var authToken = _settingsService.AuthAccessToken;
-            var userInfo = await _userService.GetUserInfoAsync (authToken);
+            var userInfo = await _appEnvironmentService.UserService.GetUserInfoAsync (authToken);
 
             // Update Basket
-            var basket = await _basketService.GetBasketAsync (userInfo.UserId, authToken);
+            var basket = await _appEnvironmentService.BasketService.GetBasketAsync (userInfo.UserId, authToken);
 
             if (basket != null && basket.Items != null && basket.Items.Any ())
             {
@@ -128,12 +127,12 @@ namespace eShopOnContainers.ViewModels
             BasketItems.Remove (item);
 
             var authToken = _settingsService.AuthAccessToken;
-            var userInfo = await _userService.GetUserInfoAsync (authToken);
-            var basket = await _basketService.GetBasketAsync (userInfo.UserId, authToken);
+            var userInfo = await _appEnvironmentService.UserService.GetUserInfoAsync (authToken);
+            var basket = await _appEnvironmentService.BasketService.GetBasketAsync (userInfo.UserId, authToken);
             if (basket != null)
             {
                 basket.Items.Remove (item);
-                await _basketService.UpdateBasketAsync (basket, authToken);
+                await _appEnvironmentService.BasketService.UpdateBasketAsync (basket, authToken);
                 BadgeCount = basket.Items.Count ();
             }
 
@@ -159,7 +158,7 @@ namespace eShopOnContainers.ViewModels
         {
             if (BasketItems?.Any() ?? false)
             {
-                _basketService.LocalBasketItems = BasketItems;
+                _appEnvironmentService.BasketService.LocalBasketItems = BasketItems;
                 await NavigationService.NavigateToAsync ("Checkout");
             }
         }

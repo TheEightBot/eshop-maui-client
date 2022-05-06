@@ -14,14 +14,12 @@ namespace eShopOnContainers.Services.FixUri
     public class FixUriService : IFixUriService
     {
         private readonly ISettingsService _settingsService;
-        private readonly IAppEnvironmentService _appEnvironmentService;
 
         private Regex IpRegex = new Regex(@"\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b");
 
-        public FixUriService(ISettingsService settingsService, IAppEnvironmentService appEnvironmentService)
+        public FixUriService(ISettingsService settingsService)
         {
             _settingsService = settingsService;
-            _appEnvironmentService = appEnvironmentService;
         }
 
         public void FixCatalogItemPictureUri(IEnumerable<CatalogItem> catalogItems)
@@ -33,8 +31,7 @@ namespace eShopOnContainers.Services.FixUri
 
             try
             {
-                if (!_appEnvironmentService.UseMockService
-                    && _settingsService.IdentityEndpointBase != GlobalSetting.DefaultEndpoint)
+                if (!_settingsService.UseMocks && _settingsService.IdentityEndpointBase != GlobalSetting.DefaultEndpoint)
                 {
                     foreach (var catalogItem in catalogItems)
                     {
@@ -66,8 +63,7 @@ namespace eShopOnContainers.Services.FixUri
 
             try
             {
-                if (!_appEnvironmentService.UseMockService
-                    && _settingsService.IdentityEndpointBase != GlobalSetting.DefaultEndpoint)
+                if (!_settingsService.UseMocks && _settingsService.IdentityEndpointBase != GlobalSetting.DefaultEndpoint)
                 {
                     foreach (var basketItem in basketItems)
                     {
@@ -98,8 +94,7 @@ namespace eShopOnContainers.Services.FixUri
 
             try
             {
-                if (!_appEnvironmentService.UseMockService
-                    && _settingsService.IdentityEndpointBase != GlobalSetting.DefaultEndpoint)
+                if (!_settingsService.UseMocks && _settingsService.IdentityEndpointBase != GlobalSetting.DefaultEndpoint)
                 {
                     foreach (var campaignItem in campaignItems)
                     {
