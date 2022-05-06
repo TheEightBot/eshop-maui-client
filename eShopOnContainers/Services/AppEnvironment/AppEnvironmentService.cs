@@ -3,6 +3,7 @@ using eShopOnContainers.Services.Basket;
 using eShopOnContainers.Services.Catalog;
 using eShopOnContainers.Services.Marketing;
 using eShopOnContainers.Services.Order;
+using eShopOnContainers.Services.Settings;
 using eShopOnContainers.Services.User;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -11,44 +12,71 @@ namespace eShopOnContainers.Services.AppEnvironment
 {
     public class AppEnvironmentService : IAppEnvironmentService
     {
-        private readonly IServiceCollection _serviceCollection;
+        private readonly IBasketService _mockBasketService;
+        private readonly IBasketService _basketService;
 
-        public AppEnvironmentService(IServiceCollection serviceCollection)
+        private readonly ICampaignService _mockCampaignService;
+        private readonly ICampaignService _campaignService;
+
+        private readonly ICatalogService _mockCatalogService;
+        private readonly ICatalogService _catalogService;
+
+        private readonly IOrderService _mockOrderService;
+        private readonly IOrderService _orderService;
+
+        private readonly IUserService _mockUserService;
+        private readonly IUserService _userService;
+
+        public IBasketService BasketService { get; private set; }
+
+        public ICampaignService CampaignService { get; private set; }
+
+        public ICatalogService CatalogService { get; private set; }
+
+        public IOrderService OrderService { get; private set; }
+
+        public IUserService UserService { get; private set; }
+
+        public AppEnvironmentService(
+            IBasketService mockBasketService, IBasketService basketService,
+            ICampaignService mockCampaignService, ICampaignService campaignService,
+            ICatalogService mockCatalogService, ICatalogService catalogService,
+            IOrderService mockOrderService, IOrderService orderService,
+            IUserService mockUserService, IUserService userService)
         {
-            _serviceCollection = serviceCollection;
-        }
+            _mockBasketService = mockBasketService;
+            _basketService = basketService;
 
-        public bool UseMockService { get; private set; }
+            _mockCampaignService = mockCampaignService;
+            _campaignService = campaignService;
+
+            _mockCatalogService = mockCatalogService;
+            _catalogService = catalogService;
+
+            _mockOrderService = mockOrderService;
+            _orderService = orderService;
+
+            _mockUserService = mockUserService;
+            _userService = userService;
+        }
 
         public void UpdateDependencies(bool useMockServices)
         {
-            UseMockService = useMockServices;
-
-            _serviceCollection.RemoveAll<IBasketService>();
-            _serviceCollection.RemoveAll<ICampaignService>();
-            _serviceCollection.RemoveAll<ICatalogService>();
-            _serviceCollection.RemoveAll<IOrderService>();
-            _serviceCollection.RemoveAll<IUserService>();
-
             if (useMockServices)
             {
-                _serviceCollection.AddSingleton<IBasketService, BasketMockService>();
-                _serviceCollection.AddSingleton<ICampaignService, CampaignMockService>();
-                _serviceCollection.AddSingleton<ICatalogService, CatalogMockService>();
-                _serviceCollection.AddSingleton<IOrderService, OrderMockService>();
-                _serviceCollection.AddSingleton<IUserService, UserMockService>();
-
-                UseMockService = true;
+                BasketService = _mockBasketService;
+                CampaignService = _mockCampaignService;
+                CatalogService = _mockCatalogService;
+                OrderService = _mockOrderService;
+                UserService = _mockUserService;
             }
             else
             {
-                _serviceCollection.AddSingleton<IBasketService, BasketService>();
-                _serviceCollection.AddSingleton<ICampaignService, CampaignService>();
-                _serviceCollection.AddSingleton<ICatalogService, CatalogService>();
-                _serviceCollection.AddSingleton<IOrderService, OrderService>();
-                _serviceCollection.AddSingleton<IUserService, UserService>();
-
-                UseMockService = false;
+                BasketService = _basketService;
+                CampaignService = _campaignService;
+                CatalogService = _catalogService;
+                OrderService = _orderService;
+                UserService = _userService;
             }
         }
     }

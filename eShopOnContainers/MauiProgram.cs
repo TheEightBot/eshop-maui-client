@@ -13,6 +13,7 @@ using eShopOnContainers.Services.RequestProvider;
 using eShopOnContainers.Services.Settings;
 using eShopOnContainers.Services.Theme;
 using eShopOnContainers.Services.User;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace eShopOnContainers;
 
@@ -47,8 +48,6 @@ public static class MauiProgram
 
     public static MauiAppBuilder RegisterAppServices(this MauiAppBuilder mauiAppBuilder)
     {
-        mauiAppBuilder.Services.AddSingleton<IServiceCollection>(mauiAppBuilder.Services);
-        mauiAppBuilder.Services.AddSingleton<IAppEnvironmentService, AppEnvironmentService>();
         mauiAppBuilder.Services.AddSingleton<ISettingsService, SettingsService>();
         mauiAppBuilder.Services.AddSingleton<INavigationService, MauiNavigationService>();
         mauiAppBuilder.Services.AddSingleton<IDialogService, DialogService>();
@@ -57,13 +56,27 @@ public static class MauiProgram
         mauiAppBuilder.Services.AddSingleton<IIdentityService, IdentityService>();
         mauiAppBuilder.Services.AddSingleton<IFixUriService, FixUriService>();
         mauiAppBuilder.Services.AddSingleton<ILocationService, LocationService>();
-        mauiAppBuilder.Services.AddSingleton<ICatalogService, CatalogMockService>();
-        mauiAppBuilder.Services.AddSingleton<IBasketService, BasketMockService>();
-        mauiAppBuilder.Services.AddSingleton<IOrderService, OrderMockService>();
-        mauiAppBuilder.Services.AddSingleton<IUserService, UserMockService>();
-        mauiAppBuilder.Services.AddSingleton<ICampaignService, CampaignMockService>();
 
         mauiAppBuilder.Services.AddSingleton<ITheme, Theme>();
+
+        mauiAppBuilder.Services.AddSingleton<IAppEnvironmentService, AppEnvironmentService>(
+            serviceProvider =>
+            {
+                var requestProvider = serviceProvider.GetService<IRequestProvider>();
+                var fixUriService = serviceProvider.GetService<IFixUriService>();
+                var settingsService = serviceProvider.GetService<ISettingsService>();
+
+                var aes =
+                    new AppEnvironmentService(
+                        new BasketMockService(), new BasketService(requestProvider, fixUriService),
+                        new CampaignMockService(), new CampaignService(requestProvider, fixUriService),
+                        new CatalogMockService(), new CatalogService(requestProvider, fixUriService),
+                        new OrderMockService(), new OrderService(requestProvider),
+                        new UserMockService(), new UserService(requestProvider));
+
+                aes.UpdateDependencies(settingsService.UseMocks);
+                return aes;
+            });
 
         return mauiAppBuilder;
     }

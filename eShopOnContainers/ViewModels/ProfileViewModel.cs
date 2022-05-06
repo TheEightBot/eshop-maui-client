@@ -10,24 +10,25 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Microsoft.Maui;
 using eShopOnContainers.Services;
+using eShopOnContainers.Services.AppEnvironment;
 
 namespace eShopOnContainers.ViewModels
 {
     public class ProfileViewModel : ViewModelBase
     {
         private readonly ISettingsService _settingsService;
-        private readonly IOrderService _orderService;
+        private readonly IAppEnvironmentService _appEnvironmentService;
         private ObservableCollection<Order> _orders;
         private Order _selectedOrder;
 
         public ProfileViewModel(
-            IOrderService orderService,
+            IAppEnvironmentService appEnvironmentService,
             IDialogService dialogService, INavigationService navigationService, ISettingsService settingsService)
             : base(dialogService, navigationService, settingsService)
         {
             this.MultipleInitialization = true;
 
-            _orderService = orderService;
+            _appEnvironmentService = appEnvironmentService;
             _settingsService = settingsService;
         }
 
@@ -63,7 +64,7 @@ namespace eShopOnContainers.ViewModels
 
             // Get orders
             var authToken = _settingsService.AuthAccessToken;
-            var orders = await _orderService.GetOrdersAsync (authToken);
+            var orders = await _appEnvironmentService.OrderService.GetOrdersAsync (authToken);
             Orders = orders.ToObservableCollection ();
 
             IsBusy = false;

@@ -8,24 +8,25 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Microsoft.Maui;
 using eShopOnContainers.Services;
+using eShopOnContainers.Services.AppEnvironment;
 
 namespace eShopOnContainers.ViewModels
 {
     public class OrderDetailViewModel : ViewModelBase
     {
         private readonly ISettingsService _settingsService;
-        private readonly IOrderService _orderService;
+        private readonly IAppEnvironmentService _appEnvironmentService;
 
         private Order _order;
         private bool _isSubmittedOrder;
         private string _orderStatusText;
 
         public OrderDetailViewModel(
-            IOrderService orderService,
+            IAppEnvironmentService appEnvironmentService,
             IDialogService dialogService, INavigationService navigationService, ISettingsService settingsService)
             : base(dialogService, navigationService, settingsService)
         {
-            _orderService = orderService;
+            _appEnvironmentService = appEnvironmentService;
             _settingsService = settingsService;
         }
 
@@ -72,7 +73,7 @@ namespace eShopOnContainers.ViewModels
 
                 // Get order detail info
                 var authToken = _settingsService.AuthAccessToken;
-                Order = await _orderService.GetOrderAsync (orderNumber.Value, authToken);
+                Order = await _appEnvironmentService.OrderService.GetOrderAsync (orderNumber.Value, authToken);
                 IsSubmittedOrder = Order.OrderStatus == OrderStatus.Submitted;
                 OrderStatusText = Order.OrderStatus.ToString ().ToUpper ();
 
@@ -84,7 +85,7 @@ namespace eShopOnContainers.ViewModels
         {
             var authToken = _settingsService.AuthAccessToken;
 
-            var result = await _orderService.CancelOrderAsync(_order.OrderNumber, authToken);
+            var result = await _appEnvironmentService.OrderService.CancelOrderAsync(_order.OrderNumber, authToken);
 
             if (result)
             {
@@ -92,7 +93,7 @@ namespace eShopOnContainers.ViewModels
             }
             else
             {
-                Order = await _orderService.GetOrderAsync(Order.OrderNumber, authToken);
+                Order = await _appEnvironmentService.OrderService.GetOrderAsync(Order.OrderNumber, authToken);
                 OrderStatusText = Order.OrderStatus.ToString().ToUpper();
             }
 
