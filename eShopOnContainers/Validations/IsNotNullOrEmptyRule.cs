@@ -6,12 +6,10 @@
 
         public bool Check(T value)
         {
-            if (value == null)
+            if (value is not string str)
             {
                 return false;
             }
-
-            var str = value as string;
 
             return !string.IsNullOrWhiteSpace(str);
         }

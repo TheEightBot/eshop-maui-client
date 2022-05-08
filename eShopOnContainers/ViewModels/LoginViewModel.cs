@@ -13,10 +13,12 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Microsoft.Maui;
 using eShopOnContainers.Services;
+using CommunityToolkit.Mvvm.Input;
+using System.ComponentModel;
 
 namespace eShopOnContainers.ViewModels
 {
-    public class LoginViewModel : ViewModelBase
+    public class LoginViewModel : ObservableViewModelBase
     {
         private ValidatableObject<string> _userName;
         private ValidatableObject<string> _password;
@@ -29,6 +31,54 @@ namespace eShopOnContainers.ViewModels
         private IOpenUrlService _openUrlService;
         private IIdentityService _identityService;
 
+        public ValidatableObject<string> UserName
+        {
+            get => _userName;
+            private set => SetProperty(ref _userName, value);
+        }
+
+        public ValidatableObject<string> Password
+        {
+            get => _password;
+            private set  => SetProperty(ref _password, value);
+        }
+
+        public bool IsMock
+        {
+            get => _isMock;
+            set => SetProperty(ref _isMock, value);
+        }
+
+        public bool IsValid
+        {
+            get => _isValid;
+            set => SetProperty(ref _isValid, value);
+        }
+
+        public bool IsLogin
+        {
+            get => _isLogin;
+            set => SetProperty(ref _isLogin, value);
+        }
+
+        public string LoginUrl
+        {
+            get => _authUrl;
+            set => SetProperty(ref _authUrl, value);
+        }
+
+        public ICommand MockSignInCommand { get; }
+
+        public ICommand SignInCommand { get; }
+
+        public ICommand RegisterCommand { get; }
+
+        public ICommand NavigateCommand { get; }
+
+        public ICommand SettingsCommand { get; }
+
+        public ICommand ValidateCommand { get; }
+
         public LoginViewModel(
             IOpenUrlService openUrlService, IIdentityService identityService,
             IDialogService dialogService, INavigationService navigationService, ISettingsService settingsService)
@@ -38,87 +88,20 @@ namespace eShopOnContainers.ViewModels
             _openUrlService = openUrlService;
             _identityService = identityService;
 
-            _userName = new ValidatableObject<string>();
-            _password = new ValidatableObject<string>();
+            UserName = new ValidatableObject<string>();
+            Password = new ValidatableObject<string>();
+
+            MockSignInCommand = new AsyncRelayCommand(MockSignInAsync);
+            SignInCommand = new AsyncRelayCommand(SignInAsync);
+            RegisterCommand = new AsyncRelayCommand(RegisterAsync);
+            NavigateCommand = new AsyncRelayCommand<string>(NavigateAsync);
+            SettingsCommand = new AsyncRelayCommand(SettingsAsync);
+            ValidateCommand = new RelayCommand(() => Validate());
 
             InvalidateMock();
             AddValidations();
         }
-
-        public ValidatableObject<string> UserName
-        {
-            get => _userName;
-            set
-            {
-                _userName = value;
-                RaisePropertyChanged(() => UserName);
-            }
-        }
-
-        public ValidatableObject<string> Password
-        {
-            get => _password;
-            set
-            {
-                _password = value;
-                RaisePropertyChanged(() => Password);
-            }
-        }
-
-        public bool IsMock
-        {
-            get => _isMock;
-            set
-            {
-                _isMock = value;
-                RaisePropertyChanged(() => IsMock);
-            }
-        }
-
-        public bool IsValid
-        {
-            get => _isValid;
-            set
-            {
-                _isValid = value;
-                RaisePropertyChanged(() => IsValid);
-            }
-        }
-
-        public bool IsLogin
-        {
-            get => _isLogin;
-            set
-            {
-                _isLogin = value;
-                RaisePropertyChanged(() => IsLogin);
-            }
-        }
-
-        public string LoginUrl
-        {
-            get => _authUrl;
-            set
-            {
-                _authUrl = value;
-                RaisePropertyChanged(() => LoginUrl);
-            }
-        }
-
-        public ICommand MockSignInCommand => new Command(async () => await MockSignInAsync());
-
-        public ICommand SignInCommand => new Command(async () => await SignInAsync());
-
-        public ICommand RegisterCommand => new Command(async () => await RegisterAsync());
-
-        public ICommand NavigateCommand => new Command<string>(async (url) => await NavigateAsync(url));
-
-        public ICommand SettingsCommand => new Command(async () => await SettingsAsync());
-
-        public ICommand ValidateUserNameCommand => new Command(() => ValidateUserName());
-
-        public ICommand ValidatePasswordCommand => new Command(() => ValidatePassword());
-
+                
         public override Task InitializeAsync (IDictionary<string, object> query)
         {
             var logout = query.GetValueAsBool ("Logout");
@@ -242,26 +225,13 @@ namespace eShopOnContainers.ViewModels
 
         private bool Validate()
         {
-            bool isValidUser = ValidateUserName();
-            bool isValidPassword = ValidatePassword();
-
-            return isValidUser && isValidPassword;
-        }
-
-        private bool ValidateUserName()
-        {
-            return _userName.Validate();
-        }
-
-        private bool ValidatePassword()
-        {
-            return _password.Validate();
+            return UserName.Validate() && Password.Validate();
         }
 
         private void AddValidations()
         {
-            _userName.Validations.Add(new IsNotNullOrEmptyRule<string> { ValidationMessage = "A username is required." });
-            _password.Validations.Add(new IsNotNullOrEmptyRule<string> { ValidationMessage = "A password is required." });
+            UserName.Validations.Add(new IsNotNullOrEmptyRule<string> { ValidationMessage = "A username is required." });
+            Password.Validations.Add(new IsNotNullOrEmptyRule<string> { ValidationMessage = "A password is required." });
         }
 
         public void InvalidateMock()
