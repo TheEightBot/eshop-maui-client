@@ -9,6 +9,7 @@ using System.Windows.Input;
 using Microsoft.Maui;
 using eShopOnContainers.Services;
 using eShopOnContainers.Services.AppEnvironment;
+using eShopOnContainers.Extensions;
 
 namespace eShopOnContainers.ViewModels
 {
@@ -19,6 +20,16 @@ namespace eShopOnContainers.ViewModels
 
         private ObservableCollection<CampaignItem> _campaigns;
 
+        public ObservableCollection<CampaignItem> Campaigns
+        {
+            get => _campaigns;
+            private set
+            {
+                _campaigns = value;
+                RaisePropertyChanged(() => Campaigns);
+            }
+        }
+
         public CampaignViewModel(
             IAppEnvironmentService appEnvironmentService,
             IDialogService dialogService, INavigationService navigationService, ISettingsService settingsService)
@@ -26,17 +37,10 @@ namespace eShopOnContainers.ViewModels
         {
             _appEnvironmentService = appEnvironmentService;
             _settingsService = settingsService;
+
+            Campaigns = new ObservableCollection<CampaignItem>();
         }
 
-        public ObservableCollection<CampaignItem> Campaigns
-        {
-            get => _campaigns;
-            set
-            {
-                _campaigns = value;
-                RaisePropertyChanged(() => Campaigns);
-            }
-        }
 
         public ICommand GetCampaignDetailsCommand => new Command<CampaignItem>(async (item) => await GetCampaignDetailsAsync(item));
 
@@ -44,7 +48,8 @@ namespace eShopOnContainers.ViewModels
         {
             IsBusy = true;
             // Get campaigns by user
-            Campaigns = await _appEnvironmentService.CampaignService.GetAllCampaignsAsync (_settingsService.AuthAccessToken);
+            var campaigns = await _appEnvironmentService.CampaignService.GetAllCampaignsAsync (_settingsService.AuthAccessToken);
+            Campaigns.ReloadData(campaigns);
             IsBusy = false;
         }
 

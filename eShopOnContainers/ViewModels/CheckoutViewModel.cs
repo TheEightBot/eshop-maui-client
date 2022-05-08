@@ -131,7 +131,7 @@ namespace eShopOnContainers.ViewModels
                 var orders = await _appEnvironmentService.OrderService.GetOrdersAsync (authToken);
 
                 // Create the OrderNumber
-                Order.OrderNumber = orders.Count + 1;
+                Order.OrderNumber = orders.Count() + 1;
                 RaisePropertyChanged (() => Order);
             }
 

@@ -13,36 +13,27 @@ using System.Windows.Input;
 using Microsoft.Maui;
 using eShopOnContainers.Services;
 using eShopOnContainers.Services.AppEnvironment;
+using eShopOnContainers.Extensions;
 
 namespace eShopOnContainers.ViewModels
 {
     public class CatalogViewModel : ViewModelBase
     {
         private ObservableCollection<CatalogItem> _products;
-        private CatalogItem _selectedProduct;
         private ObservableCollection<CatalogBrand> _brands;
-        private CatalogBrand _brand;
         private ObservableCollection<CatalogType> _types;
+
+        private CatalogItem _selectedProduct;
+        private CatalogBrand _brand;
         private CatalogType _type;
         private int _badgeCount;
         private IAppEnvironmentService _appEnvironmentService;
         private ISettingsService _settingsService;
 
-        public CatalogViewModel(
-            IAppEnvironmentService appEnvironmentService,
-            IDialogService dialogService, INavigationService navigationService, ISettingsService settingsService)
-            : base(dialogService, navigationService, settingsService)
-        {
-            this.MultipleInitialization = true;
-
-            _appEnvironmentService = appEnvironmentService;
-            _settingsService = settingsService;
-        }
-
         public ObservableCollection<CatalogItem> Products
         {
             get => _products;
-            set
+            private set
             {
                 _products = value;
                 RaisePropertyChanged(() => Products);
@@ -64,7 +55,7 @@ namespace eShopOnContainers.ViewModels
         public ObservableCollection<CatalogBrand> Brands
         {
             get => _brands;
-            set
+            private set
             {
                 _brands = value;
                 RaisePropertyChanged(() => Brands);
@@ -85,7 +76,7 @@ namespace eShopOnContainers.ViewModels
         public ObservableCollection<CatalogType> Types
         {
             get => _types;
-            set
+            private set
             {
                 _types = value;
                 RaisePropertyChanged(() => Types);
@@ -103,7 +94,6 @@ namespace eShopOnContainers.ViewModels
             }
         }
 
-        public bool IsFilter { get { return Brand != null || Type != null; } }
 
         public int BadgeCount
         {
@@ -114,6 +104,25 @@ namespace eShopOnContainers.ViewModels
                 RaisePropertyChanged(() => BadgeCount);
             }
         }
+
+        public bool IsFilter { get { return Brand != null || Type != null; } }
+
+        public CatalogViewModel(
+            IAppEnvironmentService appEnvironmentService,
+            IDialogService dialogService, INavigationService navigationService, ISettingsService settingsService)
+            : base(dialogService, navigationService, settingsService)
+        {
+            this.MultipleInitialization = true;
+
+            _appEnvironmentService = appEnvironmentService;
+            _settingsService = settingsService;
+
+            Products = new ObservableCollection<CatalogItem>();
+            Brands = new ObservableCollection<CatalogBrand>();
+            Types = new ObservableCollection<CatalogType>();
+        }
+
+        
 
         public ICommand AddCatalogItemCommand => new Command<CatalogItem>(AddCatalogItem);
 
@@ -128,9 +137,13 @@ namespace eShopOnContainers.ViewModels
             IsBusy = true;
 
             // Get Catalog, Brands and Types
-            Products = await _appEnvironmentService.CatalogService.GetCatalogAsync ();
-            Brands = await _appEnvironmentService.CatalogService.GetCatalogBrandAsync ();
-            Types = await _appEnvironmentService.CatalogService.GetCatalogTypeAsync ();
+            var products = await _appEnvironmentService.CatalogService.GetCatalogAsync ();
+            var brands = await _appEnvironmentService.CatalogService.GetCatalogBrandAsync ();
+            var types = await _appEnvironmentService.CatalogService.GetCatalogTypeAsync ();
+
+            Products.ReloadData(products);
+            Brands.ReloadData(brands);
+            Types.ReloadData(types);
 
             var authToken = _settingsService.AuthAccessToken;
             var userInfo = await _appEnvironmentService.UserService.GetUserInfoAsync (authToken);
@@ -179,7 +192,8 @@ namespace eShopOnContainers.ViewModels
 
                 if (Brand != null && Type != null)
                 {
-                    Products = await _appEnvironmentService.CatalogService.FilterAsync(Brand.Id, Type.Id);
+                    var filteredProducts = await _appEnvironmentService.CatalogService.FilterAsync(Brand.Id, Type.Id);
+                    Products.ReloadData(filteredProducts);
                 }
 
                 await NavigationService.PopAsync();
@@ -198,7 +212,8 @@ namespace eShopOnContainers.ViewModels
 
                 Brand = null;
                 Type = null;
-                Products = await _appEnvironmentService.CatalogService.GetCatalogAsync();
+                var allProducts = await _appEnvironmentService.CatalogService.GetCatalogAsync();
+                Products.ReloadData(allProducts);
                  
                 await NavigationService.PopAsync(); 
             }
