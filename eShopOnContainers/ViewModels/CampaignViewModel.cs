@@ -18,9 +18,9 @@ namespace eShopOnContainers.ViewModels
         private readonly ISettingsService _settingsService;
         private readonly IAppEnvironmentService _appEnvironmentService;
 
-        private ObservableCollection<CampaignItem> _campaigns;
+        private ObservableCollectionEx<CampaignItem> _campaigns;
 
-        public ObservableCollection<CampaignItem> Campaigns
+        public ObservableCollectionEx<CampaignItem> Campaigns
         {
             get => _campaigns;
             private set
@@ -38,7 +38,7 @@ namespace eShopOnContainers.ViewModels
             _appEnvironmentService = appEnvironmentService;
             _settingsService = settingsService;
 
-            Campaigns = new ObservableCollection<CampaignItem>();
+            Campaigns = new ObservableCollectionEx<CampaignItem>();
         }
 
 
@@ -49,7 +49,7 @@ namespace eShopOnContainers.ViewModels
             IsBusy = true;
             // Get campaigns by user
             var campaigns = await _appEnvironmentService.CampaignService.GetAllCampaignsAsync (_settingsService.AuthAccessToken);
-            Campaigns.ReloadData(campaigns);
+            _campaigns.ReloadData(campaigns);
             IsBusy = false;
         }
 

@@ -17,11 +17,11 @@ using eShopOnContainers.Extensions;
 
 namespace eShopOnContainers.ViewModels
 {
-    public class CatalogViewModel : ViewModelBase
+    public class CatalogViewModel : ObservableViewModelBase
     {
-        private ObservableCollection<CatalogItem> _products;
-        private ObservableCollection<CatalogBrand> _brands;
-        private ObservableCollection<CatalogType> _types;
+        private ObservableCollectionEx<CatalogItem> _products;
+        private ObservableCollectionEx<CatalogBrand> _brands;
+        private ObservableCollectionEx<CatalogType> _types;
 
         private CatalogItem _selectedProduct;
         private CatalogBrand _brand;
@@ -30,36 +30,22 @@ namespace eShopOnContainers.ViewModels
         private IAppEnvironmentService _appEnvironmentService;
         private ISettingsService _settingsService;
 
-        public ObservableCollection<CatalogItem> Products
+        public ObservableCollectionEx<CatalogItem> Products
         {
             get => _products;
-            private set
-            {
-                _products = value;
-                RaisePropertyChanged(() => Products);
-            }
+            private set => SetProperty(ref _products, value);
         }
 
         public CatalogItem SelectedProduct
         {
             get => _selectedProduct;
-            set
-            {
-                if (value == null)
-                    return;
-                _selectedProduct = null;
-                RaisePropertyChanged(() => SelectedProduct);
-            }
+            set => SetProperty(ref _selectedProduct, value);
         }
 
-        public ObservableCollection<CatalogBrand> Brands
+        public ObservableCollectionEx<CatalogBrand> Brands
         {
             get => _brands;
-            private set
-            {
-                _brands = value;
-                RaisePropertyChanged(() => Brands);
-            }
+            set => SetProperty(ref _brands, value);
         }
 
         public CatalogBrand Brand
@@ -67,20 +53,15 @@ namespace eShopOnContainers.ViewModels
             get => _brand;
             set
             {
-                _brand = value;
-                RaisePropertyChanged(() => Brand);
-                RaisePropertyChanged(() => IsFilter);
+                SetProperty(ref _brand, value);
+                this.OnPropertyChanged(nameof(IsFilter));
             }
         }
 
-        public ObservableCollection<CatalogType> Types
+        public ObservableCollectionEx<CatalogType> Types
         {
             get => _types;
-            private set
-            {
-                _types = value;
-                RaisePropertyChanged(() => Types);
-            }
+            set => SetProperty(ref _types, value);
         }
 
         public CatalogType Type
@@ -88,9 +69,8 @@ namespace eShopOnContainers.ViewModels
             get => _type;
             set
             {
-                _type = value;
-                RaisePropertyChanged(() => Type);
-                RaisePropertyChanged(() => IsFilter);
+                SetProperty(ref _type, value);
+                this.OnPropertyChanged(nameof(IsFilter));
             }
         }
 
@@ -98,11 +78,7 @@ namespace eShopOnContainers.ViewModels
         public int BadgeCount
         {
             get => _badgeCount;
-            set
-            {
-                _badgeCount = value;
-                RaisePropertyChanged(() => BadgeCount);
-            }
+            set => SetProperty(ref _badgeCount, value);
         }
 
         public bool IsFilter { get { return Brand != null || Type != null; } }
@@ -117,12 +93,10 @@ namespace eShopOnContainers.ViewModels
             _appEnvironmentService = appEnvironmentService;
             _settingsService = settingsService;
 
-            Products = new ObservableCollection<CatalogItem>();
-            Brands = new ObservableCollection<CatalogBrand>();
-            Types = new ObservableCollection<CatalogType>();
+            Products = new ObservableCollectionEx<CatalogItem>();
+            Brands = new ObservableCollectionEx<CatalogBrand>();
+            Types = new ObservableCollectionEx<CatalogType>();
         }
-
-        
 
         public ICommand AddCatalogItemCommand => new Command<CatalogItem>(AddCatalogItem);
 
@@ -141,16 +115,16 @@ namespace eShopOnContainers.ViewModels
             var brands = await _appEnvironmentService.CatalogService.GetCatalogBrandAsync ();
             var types = await _appEnvironmentService.CatalogService.GetCatalogTypeAsync ();
 
-            Products.ReloadData(products);
-            Brands.ReloadData(brands);
-            Types.ReloadData(types);
-
             var authToken = _settingsService.AuthAccessToken;
             var userInfo = await _appEnvironmentService.UserService.GetUserInfoAsync (authToken);
 
             var basket = await _appEnvironmentService.BasketService.GetBasketAsync (userInfo.UserId, authToken);
 
             BadgeCount = basket?.Items?.Count () ?? 0;
+
+            _products.ReloadData(products);
+            _brands.ReloadData(brands);
+            _types.ReloadData(types);
 
             IsBusy = false;
         }
@@ -193,7 +167,7 @@ namespace eShopOnContainers.ViewModels
                 if (Brand != null && Type != null)
                 {
                     var filteredProducts = await _appEnvironmentService.CatalogService.FilterAsync(Brand.Id, Type.Id);
-                    Products.ReloadData(filteredProducts);
+                    _products.ReloadData(filteredProducts);
                 }
 
                 await NavigationService.PopAsync();
@@ -213,7 +187,7 @@ namespace eShopOnContainers.ViewModels
                 Brand = null;
                 Type = null;
                 var allProducts = await _appEnvironmentService.CatalogService.GetCatalogAsync();
-                Products.ReloadData(allProducts);
+                _products.ReloadData(allProducts);
                  
                 await NavigationService.PopAsync(); 
             }
