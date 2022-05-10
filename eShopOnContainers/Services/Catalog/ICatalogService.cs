@@ -6,9 +6,9 @@ namespace eShopOnContainers.Services.Catalog
 {
     public interface ICatalogService
     {
-        Task<ObservableCollection<CatalogBrand>> GetCatalogBrandAsync();
-        Task<ObservableCollection<CatalogItem>> FilterAsync(int catalogBrandId, int catalogTypeId);
-        Task<ObservableCollection<CatalogType>> GetCatalogTypeAsync();
-        Task<ObservableCollection<CatalogItem>> GetCatalogAsync();
+        Task<IEnumerable<CatalogBrand>> GetCatalogBrandAsync();
+        Task<IEnumerable<CatalogItem>> FilterAsync(int catalogBrandId, int catalogTypeId);
+        Task<IEnumerable<CatalogType>> GetCatalogTypeAsync();
+        Task<IEnumerable<CatalogItem>> GetCatalogAsync();
     }
 }

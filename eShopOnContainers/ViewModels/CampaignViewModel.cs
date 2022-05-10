@@ -9,6 +9,7 @@ using System.Windows.Input;
 using Microsoft.Maui;
 using eShopOnContainers.Services;
 using eShopOnContainers.Services.AppEnvironment;
+using eShopOnContainers.Extensions;
 
 namespace eShopOnContainers.ViewModels
 {
@@ -17,7 +18,17 @@ namespace eShopOnContainers.ViewModels
         private readonly ISettingsService _settingsService;
         private readonly IAppEnvironmentService _appEnvironmentService;
 
-        private ObservableCollection<CampaignItem> _campaigns;
+        private ObservableCollectionEx<CampaignItem> _campaigns;
+
+        public ObservableCollectionEx<CampaignItem> Campaigns
+        {
+            get => _campaigns;
+            private set
+            {
+                _campaigns = value;
+                RaisePropertyChanged(() => Campaigns);
+            }
+        }
 
         public CampaignViewModel(
             IAppEnvironmentService appEnvironmentService,
@@ -26,17 +37,10 @@ namespace eShopOnContainers.ViewModels
         {
             _appEnvironmentService = appEnvironmentService;
             _settingsService = settingsService;
+
+            Campaigns = new ObservableCollectionEx<CampaignItem>();
         }
 
-        public ObservableCollection<CampaignItem> Campaigns
-        {
-            get => _campaigns;
-            set
-            {
-                _campaigns = value;
-                RaisePropertyChanged(() => Campaigns);
-            }
-        }
 
         public ICommand GetCampaignDetailsCommand => new Command<CampaignItem>(async (item) => await GetCampaignDetailsAsync(item));
 
@@ -44,7 +48,8 @@ namespace eShopOnContainers.ViewModels
         {
             IsBusy = true;
             // Get campaigns by user
-            Campaigns = await _appEnvironmentService.CampaignService.GetAllCampaignsAsync (_settingsService.AuthAccessToken);
+            var campaigns = await _appEnvironmentService.CampaignService.GetAllCampaignsAsync (_settingsService.AuthAccessToken);
+            _campaigns.ReloadData(campaigns);
             IsBusy = false;
         }
 

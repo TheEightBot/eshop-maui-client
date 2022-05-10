@@ -41,14 +41,14 @@
     <Grid ColumnSpacing="0" RowSpacing="0">
         <!--  CATALOG  -->
         <Label
-            IsVisible="{Binding Products, Converter={StaticResource ListIsNullOrEmptyConverter}}"
+            IsVisible="{Binding Products.Count, Converter={StaticResource DoesNotHaveCountConverter}}"
             Text="NO PRODUCTS FOUND"
             HorizontalOptions="Center"
             VerticalOptions="Center" />
         <CollectionView
             x:Name="Products"
             SelectedItem="{Binding SelectedProduct, Mode=TwoWay}"
-            IsVisible="{Binding Products, Converter={StaticResource ListIsNotNullOrEmptyConverter}}"
+            IsVisible="{Binding Products.Count, Converter={StaticResource HasCountConverter}}"
             ItemsSource="{Binding Products}"
             SelectionMode="Single"
             SelectionChangedCommand="{Binding AddCatalogItemCommand}"
