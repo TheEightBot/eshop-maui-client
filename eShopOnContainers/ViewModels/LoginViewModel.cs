@@ -1,4 +1,4 @@
-using eShopOnContainers.Extensions;
+﻿using eShopOnContainers.Extensions;
 using eShopOnContainers.Models.User;
 using eShopOnContainers.Services.Identity;
 using eShopOnContainers.Services.OpenUrl;
@@ -32,8 +32,6 @@ namespace eShopOnContainers.ViewModels
         private bool _isValid;
         private bool _isLogin;
         private string _authUrl;
-
-        private bool? _logout;
 
         public ValidatableObject<string> UserName
         {
@@ -108,16 +106,14 @@ namespace eShopOnContainers.ViewModels
         {
             base.ApplyQueryAttributes(query);
 
-            query.ValueAsBool ("Logout", ref _logout);
+            if(query.ValueAsBool("Logout", out var logout) && logout == true)
+            {
+                PerformLogout ();
+            }
         }
 
         public override Task InitializeAsync ()
         {
-            if(_logout.HasValue && _logout.Value == true)
-            {
-                Logout ();
-            }
-
             return Task.CompletedTask;
         }
 
@@ -176,7 +172,7 @@ namespace eShopOnContainers.ViewModels
             return _openUrlService.OpenUrl(GlobalSetting.Instance.RegisterWebsite);
         }
 
-        private void Logout()
+        private void PerformLogout()
         {
             var authIdToken = _settingsService.AuthIdToken;
             var logoutRequest = _identityService.CreateLogoutRequest(authIdToken);
@@ -194,6 +190,9 @@ namespace eShopOnContainers.ViewModels
             }
 
             _settingsService.UseFakeLocation = false;
+
+            UserName.Value = string.Empty;
+            Password.Value = string.Empty;
         }
 
         private async Task NavigateAsync(string url)

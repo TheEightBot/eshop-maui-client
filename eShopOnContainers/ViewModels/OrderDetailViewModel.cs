@@ -1,4 +1,4 @@
-using eShopOnContainers.Extensions;
+﻿using eShopOnContainers.Extensions;
 using eShopOnContainers.Models.Orders;
 using eShopOnContainers.Services.Order;
 using eShopOnContainers.Services.Settings;
@@ -13,6 +13,8 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace eShopOnContainers.ViewModels
 {
+
+    [QueryProperty(nameof(OrderNumber), nameof(Models.Orders.Order.OrderNumber))]
     public class OrderDetailViewModel : ViewModelBase
     {
         private readonly ISettingsService _settingsService;
@@ -22,7 +24,7 @@ namespace eShopOnContainers.ViewModels
         private bool _isSubmittedOrder;
         private string _orderStatusText;
 
-        private int? _orderNumber;
+        public int OrderNumber { get; set; }
 
         public Order Order
         {
@@ -53,13 +55,6 @@ namespace eShopOnContainers.ViewModels
             _settingsService = settingsService;
 
             ToggleCancelOrderCommand = new AsyncRelayCommand(ToggleCancelOrderAsync);
-        }
-
-        public override void ApplyQueryAttributes(IDictionary<string, object> query)
-        {
-            base.ApplyQueryAttributes(query);
-
-            query.ValueAsInt(nameof(Order.OrderNumber), ref _orderNumber);
         }
 
         public override async Task InitializeAsync ()

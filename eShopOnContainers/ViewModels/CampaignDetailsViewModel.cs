@@ -13,6 +13,7 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace eShopOnContainers.ViewModels
 {
+    [QueryProperty(nameof(CampaignId), nameof(Models.Marketing.Campaign.Id))]
     public class CampaignDetailsViewModel : ViewModelBase
     {
         private readonly ISettingsService _settingsService;
@@ -21,9 +22,9 @@ namespace eShopOnContainers.ViewModels
         private CampaignItem _campaign;
         private bool _isDetailsSite;
 
-        public ICommand EnableDetailsSiteCommand { get; }
+        public int CampaignId { get; set; }
 
-        private int? _campaignId;
+        public ICommand EnableDetailsSiteCommand { get; }
 
         public CampaignDetailsViewModel(
             IAppEnvironmentService appEnvironmentService,
@@ -48,23 +49,13 @@ namespace eShopOnContainers.ViewModels
             set => SetProperty(ref _isDetailsSite, value);
         }
 
-        public override void ApplyQueryAttributes(IDictionary<string, object> query)
-        {
-            base.ApplyQueryAttributes(query);
-
-            query.ValueAsInt(nameof(Campaign.Id), ref _campaignId);
-        }
-
         public override async Task InitializeAsync ()
         {
             await IsBusyFor(
                 async () =>
                 {
-                    if (_campaignId.HasValue)
-                    {
-                        // Get campaign by id
-                        Campaign = await _appEnvironmentService.CampaignService.GetCampaignByIdAsync(_campaignId.Value, _settingsService.AuthAccessToken);
-                    }
+                    // Get campaign by id
+                    Campaign = await _appEnvironmentService.CampaignService.GetCampaignByIdAsync(CampaignId, _settingsService.AuthAccessToken);
                 });
         }
 
