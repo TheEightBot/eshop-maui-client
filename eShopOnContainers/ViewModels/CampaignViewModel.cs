@@ -9,6 +9,8 @@ using System.Windows.Input;
 using Microsoft.Maui;
 using eShopOnContainers.Services;
 using eShopOnContainers.Services.AppEnvironment;
+using eShopOnContainers.Extensions;
+using CommunityToolkit.Mvvm.Input;
 
 namespace eShopOnContainers.ViewModels
 {
@@ -16,8 +18,14 @@ namespace eShopOnContainers.ViewModels
     {
         private readonly ISettingsService _settingsService;
         private readonly IAppEnvironmentService _appEnvironmentService;
+        private readonly ObservableCollectionEx<CampaignItem> _campaigns;
 
-        private ObservableCollection<CampaignItem> _campaigns;
+        public IList<CampaignItem> Campaigns
+        {
+            get => _campaigns;
+        }
+
+        public ICommand GetCampaignDetailsCommand { get; }
 
         public CampaignViewModel(
             IAppEnvironmentService appEnvironmentService,
@@ -26,25 +34,18 @@ namespace eShopOnContainers.ViewModels
         {
             _appEnvironmentService = appEnvironmentService;
             _settingsService = settingsService;
+
+            _campaigns = new ObservableCollectionEx<CampaignItem>();
+
+            GetCampaignDetailsCommand = new AsyncRelayCommand<CampaignItem>(GetCampaignDetailsAsync);
         }
 
-        public ObservableCollection<CampaignItem> Campaigns
-        {
-            get => _campaigns;
-            set
-            {
-                _campaigns = value;
-                RaisePropertyChanged(() => Campaigns);
-            }
-        }
-
-        public ICommand GetCampaignDetailsCommand => new Command<CampaignItem>(async (item) => await GetCampaignDetailsAsync(item));
-
-        public override async Task InitializeAsync (IDictionary<string, object> query)
+        public override async Task InitializeAsync ()
         {
             IsBusy = true;
             // Get campaigns by user
-            Campaigns = await _appEnvironmentService.CampaignService.GetAllCampaignsAsync (_settingsService.AuthAccessToken);
+            var campaigns = await _appEnvironmentService.CampaignService.GetAllCampaignsAsync (_settingsService.AuthAccessToken);
+            _campaigns.ReloadData(campaigns);
             IsBusy = false;
         }
 

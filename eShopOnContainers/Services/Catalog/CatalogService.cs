@@ -23,55 +23,55 @@ namespace eShopOnContainers.Services.Catalog
             _fixUriService = fixUriService;
         }
 
-        public async Task<ObservableCollection<CatalogItem>> FilterAsync(int catalogBrandId, int catalogTypeId)
+        public async Task<IEnumerable<CatalogItem>> FilterAsync(int catalogBrandId, int catalogTypeId)
         {
             var uri = UriHelper.CombineUri(GlobalSetting.Instance.GatewayShoppingEndpoint, $"{ApiUrlBase}/items/type/{catalogTypeId}/brand/{catalogBrandId}");
 
-            CatalogRoot catalog = await _requestProvider.GetAsync<CatalogRoot>(uri);
+            CatalogRoot catalog = await _requestProvider.GetAsync<CatalogRoot>(uri).ConfigureAwait(false);
 
             if (catalog?.Data != null)
-                return catalog?.Data.ToObservableCollection();
+                return catalog?.Data;
             else
-                return new ObservableCollection<CatalogItem>();
+                return Enumerable.Empty<CatalogItem>();
         }
 
-        public async Task<ObservableCollection<CatalogItem>> GetCatalogAsync()
+        public async Task<IEnumerable<CatalogItem>> GetCatalogAsync()
         {
             var uri = UriHelper.CombineUri(GlobalSetting.Instance.GatewayShoppingEndpoint, $"{ApiUrlBase}/items");
 
-            CatalogRoot catalog = await _requestProvider.GetAsync<CatalogRoot>(uri);
+            CatalogRoot catalog = await _requestProvider.GetAsync<CatalogRoot>(uri).ConfigureAwait(false);
 
             if (catalog?.Data != null)
             {
-                _fixUriService.FixCatalogItemPictureUri(catalog?.Data);
-                return catalog?.Data.ToObservableCollection();
+                _fixUriService.FixCatalogItemPictureUri(catalog.Data);
+                return catalog.Data;
             }
             else
-                return new ObservableCollection<CatalogItem>();
+                return Enumerable.Empty<CatalogItem>();
         }
 
-        public async Task<ObservableCollection<CatalogBrand>> GetCatalogBrandAsync()
+        public async Task<IEnumerable<CatalogBrand>> GetCatalogBrandAsync()
         {
             var uri = UriHelper.CombineUri(GlobalSetting.Instance.GatewayShoppingEndpoint, $"{ApiUrlBase}/catalogbrands");
 
-            IEnumerable<CatalogBrand> brands = await _requestProvider.GetAsync<IEnumerable<CatalogBrand>>(uri);
+            IEnumerable<CatalogBrand> brands = await _requestProvider.GetAsync<IEnumerable<CatalogBrand>>(uri).ConfigureAwait(false);
 
             if (brands != null)
-                return brands?.ToObservableCollection();
+                return brands.ToArray();
             else
-                return new ObservableCollection<CatalogBrand>();
+                return Enumerable.Empty<CatalogBrand>();
         }
 
-        public async Task<ObservableCollection<CatalogType>> GetCatalogTypeAsync()
+        public async Task<IEnumerable<CatalogType>> GetCatalogTypeAsync()
         {
             var uri = UriHelper.CombineUri(GlobalSetting.Instance.GatewayShoppingEndpoint, $"{ApiUrlBase}/catalogtypes");
 
-            IEnumerable<CatalogType> types = await _requestProvider.GetAsync<IEnumerable<CatalogType>>(uri);
+            IEnumerable<CatalogType> types = await _requestProvider.GetAsync<IEnumerable<CatalogType>>(uri).ConfigureAwait(false);
 
             if (types != null)
-                return types.ToObservableCollection();
+                return types.ToArray();
             else
-                return new ObservableCollection<CatalogType>();
+                return Enumerable.Empty<CatalogType>();
         }
     }
 }

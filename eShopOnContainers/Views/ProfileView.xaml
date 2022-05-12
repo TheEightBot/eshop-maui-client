@@ -39,7 +39,7 @@
         <Grid IsVisible="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}">
             <Label
                 HorizontalOptions="Center"
-                IsVisible="{Binding Orders, Converter={StaticResource ListIsNullOrEmptyConverter}}"
+                IsVisible="{Binding Orders.Count, Mode=OneWay, Converter={StaticResource DoesNotHaveCountConverter}}"
                 Text="NO ORDERS"
                 VerticalOptions="Center" />
         </Grid>

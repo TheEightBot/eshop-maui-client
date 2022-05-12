@@ -72,7 +72,7 @@ namespace eShopOnContainers.Services.Order
             Street = "FakeStreet"
         };
 
-        public async Task<ObservableCollection<Models.Orders.Order>> GetOrdersAsync(string token)
+        public async Task<IEnumerable<Models.Orders.Order>> GetOrdersAsync(string token)
         {
             await Task.Delay(10);
 
@@ -80,10 +80,10 @@ namespace eShopOnContainers.Services.Order
             {
                 return MockOrders
                     .OrderByDescending(o => o.OrderNumber)
-                    .ToObservableCollection();
+                    .ToArray();
             }
             else
-                return new ObservableCollection<Models.Orders.Order>();
+                return Enumerable.Empty<Models.Orders.Order>();
         }
 
         public async Task<Models.Orders.Order> GetOrderAsync(int orderId, string token)

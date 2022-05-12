@@ -104,7 +104,7 @@
 	  <None Remove="CommunityToolkit.Mvvm" />
 	</ItemGroup>
 	<ItemGroup>
-	  <PackageReference Include="CommunityToolkit.Maui" Version="1.0.0-rc2" />
+	  <PackageReference Include="CommunityToolkit.Maui" Version="1.0.0-rc3" />
 	  <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
 	  <PackageReference Include="IdentityModel" Version="3.0.0" />
 	  <PackageReference Include="PCLCrypto" Version="2.1.40-alpha" />

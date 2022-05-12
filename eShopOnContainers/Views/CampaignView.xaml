@@ -44,7 +44,7 @@
             <Grid IsVisible="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}">
                 <Label
                     HorizontalOptions="Center"
-                    IsVisible="{Binding Campaigns, Converter={StaticResource ListIsNullOrEmptyConverter}}"
+                    IsVisible="{Binding Campaigns.Count, Converter={StaticResource DoesNotHaveCountConverter}}"
                     Text="NO CAMPAIGNS FOUND"
                     VerticalOptions="Center" />
             </Grid>

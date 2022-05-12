@@ -11,6 +11,7 @@ using System.Windows.Input;
 using Microsoft.Maui;
 using eShopOnContainers.Services;
 using eShopOnContainers.Services.AppEnvironment;
+using CommunityToolkit.Mvvm.Input;
 
 namespace eShopOnContainers.ViewModels
 {
@@ -18,8 +19,24 @@ namespace eShopOnContainers.ViewModels
     {
         private readonly ISettingsService _settingsService;
         private readonly IAppEnvironmentService _appEnvironmentService;
-        private ObservableCollection<Order> _orders;
+        private readonly ObservableCollectionEx<Order> _orders;
+
         private Order _selectedOrder;
+
+        public IList<Order> Orders
+        {
+            get => _orders;
+        }
+
+        public Order SelectedOrder
+        {
+            get => _selectedOrder;
+            set => SetProperty(ref _selectedOrder, value);
+        }
+
+        public ICommand LogoutCommand { get; }
+
+        public ICommand OrderDetailCommand { get; }
 
         public ProfileViewModel(
             IAppEnvironmentService appEnvironmentService,
@@ -30,42 +47,23 @@ namespace eShopOnContainers.ViewModels
 
             _appEnvironmentService = appEnvironmentService;
             _settingsService = settingsService;
+
+            _orders = new ObservableCollectionEx<Order>();
+
+            LogoutCommand = new AsyncRelayCommand(LogoutAsync);
+
+            OrderDetailCommand = new AsyncRelayCommand<Order>(OrderDetailAsync);
         }
-
-        public ObservableCollection<Order> Orders
-        {
-            get => _orders;
-            set
-            {
-                _orders = value;
-                RaisePropertyChanged(() => Orders);
-            }
-        }
-
-        public Order SelectedOrder
-        {
-            get => _selectedOrder;
-            set
-            {
-                if (value == null)
-                    return;
-                _selectedOrder = null;
-                RaisePropertyChanged(() => SelectedOrder);
-            }
-        }
-
-        public ICommand LogoutCommand => new Command(async () => await LogoutAsync());
-
-        public ICommand OrderDetailCommand => new Command<Order>(async (order) => await OrderDetailAsync(order));
-
-        public override async Task InitializeAsync (IDictionary<string, object> query)
+               
+        public override async Task InitializeAsync ()
         {
             IsBusy = true;
 
             // Get orders
             var authToken = _settingsService.AuthAccessToken;
             var orders = await _appEnvironmentService.OrderService.GetOrdersAsync (authToken);
-            Orders = orders.ToObservableCollection ();
+
+            _orders.ReloadData(orders);
 
             IsBusy = false;
         }

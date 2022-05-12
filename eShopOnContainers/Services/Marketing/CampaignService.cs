@@ -22,16 +22,16 @@ namespace eShopOnContainers.Services.Marketing
             _fixUriService = fixUriService;
         }
 
-        public async Task<ObservableCollection<CampaignItem>> GetAllCampaignsAsync(string token)
+        public async Task<IEnumerable<CampaignItem>> GetAllCampaignsAsync(string token)
         {
             var uri = UriHelper.CombineUri(GlobalSetting.Instance.GatewayMarketingEndpoint, $"{ApiUrlBase}/user");
 
-            CampaignRoot campaign = await _requestProvider.GetAsync<CampaignRoot>(uri, token);
+            CampaignRoot campaign = await _requestProvider.GetAsync<CampaignRoot>(uri, token).ConfigureAwait(false);
 
             if (campaign?.Data != null)
             {
                 _fixUriService.FixCampaignItemPictureUri(campaign?.Data);
-                return campaign?.Data.ToObservableCollection();
+                return campaign?.Data ?? Enumerable.Empty<CampaignItem>();
             }
 
             return new ObservableCollection<CampaignItem>();
@@ -41,7 +41,7 @@ namespace eShopOnContainers.Services.Marketing
         {
             var uri = UriHelper.CombineUri(GlobalSetting.Instance.GatewayMarketingEndpoint, $"{ApiUrlBase}/{campaignId}");
 
-            return await _requestProvider.GetAsync<CampaignItem>(uri, token);
+            return await _requestProvider.GetAsync<CampaignItem>(uri, token).ConfigureAwait(false);
         }
     }
 }

@@ -40,7 +40,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <!--  SHOPPING CART  -->
-        <Grid IsVisible="{Binding BasketItems, Converter={StaticResource ListIsNotNullOrEmptyConverter}}">
+        <Grid IsVisible="{Binding BasketItems.Count,Converter={StaticResource HasCountConverter}}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="60" />
@@ -88,7 +88,7 @@
             </Grid>
         </Grid>
         <!--  EMPTY SHOPPING CART  -->
-        <Grid IsVisible="{Binding BasketItems, Converter={StaticResource ListIsNullOrEmptyConverter}}">
+        <Grid IsVisible="{Binding BasketItems.Count, Converter={StaticResource DoesNotHaveCountConverter}}">
             <Label
                 HorizontalOptions="Center"
                 Text="EMPTY SHOPPING CART"

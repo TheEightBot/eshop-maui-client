@@ -11,11 +11,17 @@ using Microsoft.Maui;
 using System.Runtime.CompilerServices;
 using eShopOnContainers.Services.AppEnvironment;
 using eShopOnContainers.Services;
+using CommunityToolkit.Mvvm.Input;
+using System.ComponentModel;
 
 namespace eShopOnContainers.ViewModels
 {
     public class SettingsViewModel : ViewModelBase
     {
+        private readonly ISettingsService _settingsService;
+        private readonly ILocationService _locationService;
+        private readonly IAppEnvironmentService _appEnvironmentService;
+
         private bool _useAzureServices;
         private bool _allowGpsLocation;
         private bool _useFakeLocation;
@@ -26,9 +32,151 @@ namespace eShopOnContainers.ViewModels
         private double _longitude;
         private string _gpsWarningMessage;
 
-        private readonly ISettingsService _settingsService;
-        private readonly ILocationService _locationService;
-        private readonly IAppEnvironmentService _appEnvironmentService;
+        public string TitleUseAzureServices
+        {
+            get => "Use Microservices/Containers from eShopOnContainers";
+        }
+
+        public string DescriptionUseAzureServices
+        {
+            get =>
+                !UseAzureServices
+                    ? "Currently using mock services that are simulated objects that mimic the behavior of real services using a controlled approach. Toggle on to configure the use of microserivces/containers."
+                    : "When enabling the use of microservices/containers, the app will attempt to use real services deployed as Docker/Kubernetes containers at the specified base endpoint, which will must be reachable through the network.";
+        }
+
+        public bool UseAzureServices
+        {
+            get => _useAzureServices;
+            set
+            {
+                UpdateUseAzureServices();
+                SetProperty(ref _useAzureServices, value);
+            }
+        }
+
+        public string TitleUseFakeLocation
+        {
+            get =>
+                !UseFakeLocation
+                    ? "Use Real Location"
+                    : "Use Fake Location";
+        }
+
+        public string DescriptionUseFakeLocation
+        {
+            get =>
+                !UseFakeLocation
+                    ? "When enabling location, the app will attempt to use the location from the device."
+                    : "Fake Location data is added for marketing campaign testing.";
+        }
+
+        public bool UseFakeLocation
+        {
+            get => _useFakeLocation;
+            set
+            {
+                UpdateFakeLocation();
+                SetProperty(ref _useFakeLocation, value);
+            }
+        }
+
+        public string TitleAllowGpsLocation
+        {
+            get =>
+                !AllowGpsLocation
+                    ? "GPS Location Disabled"
+                    : "GPS Location Enabled";
+        }
+
+        public string DescriptionAllowGpsLocation
+        {
+            get =>
+                !AllowGpsLocation
+                    ? "When disabling location, you won't receive location campaigns based upon your location."
+                    : "When enabling location, you'll receive location campaigns based upon your location.";
+        }
+
+        public string GpsWarningMessage
+        {
+            get => _gpsWarningMessage;
+            set => SetProperty(ref _gpsWarningMessage, value);
+        }
+
+        public string IdentityEndpoint
+        {
+            get => _identityEndpoint;
+            set
+            {
+                if (!string.IsNullOrEmpty(value))
+                {
+                    UpdateIdentityEndpoint();
+                }
+                SetProperty(ref _identityEndpoint, value);
+            }
+        }
+
+        public string GatewayShoppingEndpoint
+        {
+            get => _gatewayShoppingEndpoint;
+            set
+            {
+                if (!string.IsNullOrEmpty(value))
+                {
+                    UpdateGatewayShoppingEndpoint();
+                }
+                SetProperty(ref _gatewayShoppingEndpoint, value);
+            }
+        }
+
+        public string GatewayMarketingEndpoint
+        {
+            get => _gatewayMarketingEndpoint;
+            set
+            {
+                if (!string.IsNullOrEmpty(value))
+                {
+                    UpdateGatewayMarketingEndpoint();
+                }
+                SetProperty(ref _gatewayMarketingEndpoint, value);
+            }
+        }
+
+        public double Latitude
+        {
+            get => _latitude;
+            set
+            {
+                UpdateLatitude();
+                SetProperty(ref _latitude, value);
+            }
+        }
+
+        public double Longitude
+        {
+            get => _longitude;
+            set
+            {
+                UpdateLongitude();
+                SetProperty(ref _longitude, value);
+            }
+        }
+
+        public bool AllowGpsLocation
+        {
+            get => _allowGpsLocation;
+            set => SetProperty(ref _allowGpsLocation, value);
+        }
+
+        public bool UserIsLogged => !string.IsNullOrEmpty(_settingsService.AuthAccessToken);
+
+        public ICommand ToggleMockServicesCommand { get; }
+
+        public ICommand ToggleFakeLocationCommand { get; }
+
+        public ICommand ToggleSendLocationCommand { get; }
+
+        public ICommand ToggleAllowGpsLocationCommand { get; }
 
         public SettingsViewModel(
             ILocationService locationService, IAppEnvironmentService appEnvironmentService,
@@ -48,184 +196,32 @@ namespace eShopOnContainers.ViewModels
             _useFakeLocation = _settingsService.UseFakeLocation;
             _allowGpsLocation = _settingsService.AllowGpsLocation;
             _gpsWarningMessage = string.Empty;
+
+            ToggleMockServicesCommand = new RelayCommand(ToggleMockServices);
+
+            ToggleFakeLocationCommand = new RelayCommand(ToggleFakeLocation);
+
+            ToggleSendLocationCommand = new AsyncRelayCommand(ToggleSendLocationAsync);
+
+            ToggleAllowGpsLocationCommand = new RelayCommand(ToggleAllowGpsLocation);
         }
 
-        public string TitleUseAzureServices
+        protected override async void OnPropertyChanged(PropertyChangedEventArgs e)
         {
-            get => "Use Microservices/Containers from eShopOnContainers";
-        }
+            base.OnPropertyChanged(e);
 
-        public string DescriptionUseAzureServices
-        {
-            get
-            {
-                return !UseAzureServices
-                    ? "Currently using mock services that are simulated objects that mimic the behavior of real services using a controlled approach. Toggle on to configure the use of microserivces/containers."
-                        : "When enabling the use of microservices/containers, the app will attempt to use real services deployed as Docker/Kubernetes containers at the specified base endpoint, which will must be reachable through the network.";
-            }
-        }
-
-        public bool UseAzureServices
-        {
-            get => _useAzureServices;
-            set
-            {
-                _useAzureServices = value;
-                UpdateUseAzureServices();
-                RaisePropertyChanged(() => UseAzureServices);
-            }
-        }
-
-        public string TitleUseFakeLocation
-        {
-            get { return !UseFakeLocation ? "Use Real Location" : "Use Fake Location"; }
-        }
-
-        public string DescriptionUseFakeLocation
-        {
-            get
-            {
-                return !UseFakeLocation
-                    ? "When enabling location, the app will attempt to use the location from the device."
-                        : "Fake Location data is added for marketing campaign testing.";
-            }
-        }
-
-        public bool UseFakeLocation
-        {
-            get => _useFakeLocation;
-            set
-            {
-                _useFakeLocation = value;
-                UpdateFakeLocation();
-                RaisePropertyChanged(() => UseFakeLocation);
-            }
-        }
-
-        public string TitleAllowGpsLocation
-        {
-            get { return !AllowGpsLocation ? "GPS Location Disabled" : "GPS Location Enabled"; }
-        }
-
-        public string DescriptionAllowGpsLocation
-        {
-            get
-            {
-                return !AllowGpsLocation
-                    ? "When disabling location, you won't receive location campaigns based upon your location."
-                        : "When enabling location, you'll receive location campaigns based upon your location.";
-            }
-        }
-
-        public string GpsWarningMessage
-        {
-            get => _gpsWarningMessage;
-            set
-            {
-                _gpsWarningMessage = value;
-                RaisePropertyChanged(() => GpsWarningMessage);
-            }
-        }
-
-        public string IdentityEndpoint
-        {
-            get => _identityEndpoint;
-            set
-            {
-                _identityEndpoint = value;
-                if (!string.IsNullOrEmpty(_identityEndpoint))
-                {
-                    UpdateIdentityEndpoint();
-                }
-                RaisePropertyChanged(() => IdentityEndpoint);
-            }
-        }
-
-        public string GatewayShoppingEndpoint
-        {
-            get => _gatewayShoppingEndpoint;
-            set
-            {
-                _gatewayShoppingEndpoint = value;
-                if (!string.IsNullOrEmpty(_gatewayShoppingEndpoint))
-                {
-                    UpdateGatewayShoppingEndpoint();
-                }
-                RaisePropertyChanged(() => GatewayShoppingEndpoint);
-            }
-        }
-
-        public string GatewayMarketingEndpoint
-        {
-            get => _gatewayMarketingEndpoint;
-            set
-            {
-                _gatewayMarketingEndpoint = value;
-                if (!string.IsNullOrEmpty(_gatewayMarketingEndpoint))
-                {
-                    UpdateGatewayMarketingEndpoint();
-                }
-                RaisePropertyChanged(() => GatewayMarketingEndpoint);
-            }
-        }
-
-        public double Latitude
-        {
-            get => _latitude;
-            set
-            {
-                _latitude = value;
-                UpdateLatitude();
-                RaisePropertyChanged(() => Latitude);
-            }
-        }
-
-        public double Longitude
-        {
-            get => _longitude;
-            set
-            {
-                _longitude = value;
-                UpdateLongitude();
-                RaisePropertyChanged(() => Longitude);
-            }
-        }
-
-        public bool AllowGpsLocation
-        {
-            get => _allowGpsLocation;
-            set
-            {
-                _allowGpsLocation = value;
-                RaisePropertyChanged(() => AllowGpsLocation);
-            }
-        }
-
-        public bool UserIsLogged => !string.IsNullOrEmpty(_settingsService.AuthAccessToken);
-
-        public ICommand ToggleMockServicesCommand => new Command(async () => await ToggleMockServicesAsync());
-
-        public ICommand ToggleFakeLocationCommand => new Command(ToggleFakeLocationAsync);
-
-        public ICommand ToggleSendLocationCommand => new Command(async () => await ToggleSendLocationAsync());
-
-        public ICommand ToggleAllowGpsLocationCommand => new Command(ToggleAllowGpsLocation);
-
-        protected override async void OnPropertyChanged ([CallerMemberName] string propertyName = null)
-        {
-            base.OnPropertyChanged (propertyName);
-
-            if (propertyName == nameof (AllowGpsLocation))
+            if (e.PropertyName == nameof (AllowGpsLocation))
             {
                 await UpdateAllowGpsLocation ();
             }
         }
 
-        private async Task ToggleMockServicesAsync()
+        private void ToggleMockServices()
         {
             _appEnvironmentService.UpdateDependencies(!UseAzureServices);
-            RaisePropertyChanged(() => TitleUseAzureServices);
-            RaisePropertyChanged(() => DescriptionUseAzureServices);
+
+            OnPropertyChanged(nameof(TitleUseAzureServices));
+            OnPropertyChanged(nameof(DescriptionUseAzureServices));
 
             //TODO: We should re-evaluate this workflow
             if (UseAzureServices)
@@ -235,11 +231,11 @@ namespace eShopOnContainers.ViewModels
             }
         }
 
-        private void ToggleFakeLocationAsync()
+        private void ToggleFakeLocation()
         {
             _appEnvironmentService.UpdateDependencies(!UseAzureServices);
-            RaisePropertyChanged(() => TitleUseFakeLocation);
-            RaisePropertyChanged(() => DescriptionUseFakeLocation);
+            OnPropertyChanged(nameof(TitleUseFakeLocation));
+            OnPropertyChanged(nameof(DescriptionUseFakeLocation));
         }
 
         private async Task ToggleSendLocationAsync()
@@ -251,6 +247,7 @@ namespace eShopOnContainers.ViewModels
                     Latitude = _latitude,
                     Longitude = _longitude
                 };
+
                 var authToken = _settingsService.AuthAccessToken;
 
                 await _locationService.UpdateUserLocation(locationRequest, authToken);
@@ -259,8 +256,8 @@ namespace eShopOnContainers.ViewModels
 
         private void ToggleAllowGpsLocation()
         {
-            RaisePropertyChanged(() => TitleAllowGpsLocation);
-            RaisePropertyChanged(() => DescriptionAllowGpsLocation);
+            OnPropertyChanged(nameof(TitleAllowGpsLocation));
+            OnPropertyChanged(nameof(DescriptionAllowGpsLocation));
         }
 
         private void UpdateUseAzureServices()

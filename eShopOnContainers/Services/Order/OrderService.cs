@@ -24,14 +24,14 @@ namespace eShopOnContainers.Services.Order
             throw new Exception("Only available in Mock Services!");
         }
 
-        public async Task<ObservableCollection<Models.Orders.Order>> GetOrdersAsync(string token)
+        public async Task<IEnumerable<Models.Orders.Order>> GetOrdersAsync(string token)
         {
             var uri = UriHelper.CombineUri(GlobalSetting.Instance.GatewayShoppingEndpoint, ApiUrlBase);
 
-            ObservableCollection<Models.Orders.Order> orders =
-                await _requestProvider.GetAsync<ObservableCollection<Models.Orders.Order>>(uri, token);
+            var orders =
+                await _requestProvider.GetAsync<IEnumerable<Models.Orders.Order>>(uri, token).ConfigureAwait(false);
 
-            return orders;
+            return orders ?? Enumerable.Empty<Models.Orders.Order>();
 
         }
 
@@ -42,7 +42,7 @@ namespace eShopOnContainers.Services.Order
                 var uri = UriHelper.CombineUri(GlobalSetting.Instance.GatewayShoppingEndpoint, $"{ApiUrlBase}/{orderId}");
 
                 Models.Orders.Order order =
-                    await _requestProvider.GetAsync<Models.Orders.Order>(uri, token);
+                    await _requestProvider.GetAsync<Models.Orders.Order>(uri, token).ConfigureAwait(false);
 
                 return order;
             }
@@ -79,7 +79,7 @@ namespace eShopOnContainers.Services.Order
 
             try
             {
-                await _requestProvider.PutAsync(uri, cancelOrderCommand, token, header);
+                await _requestProvider.PutAsync(uri, cancelOrderCommand, token, header).ConfigureAwait(false);
             }
             //If the status of the order has changed before to click cancel button, we will get
             //a BadRequest HttpStatus

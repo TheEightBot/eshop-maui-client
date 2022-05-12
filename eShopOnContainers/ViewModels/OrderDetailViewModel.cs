@@ -9,6 +9,7 @@ using System.Windows.Input;
 using Microsoft.Maui;
 using eShopOnContainers.Services;
 using eShopOnContainers.Services.AppEnvironment;
+using CommunityToolkit.Mvvm.Input;
 
 namespace eShopOnContainers.ViewModels
 {
@@ -21,6 +22,28 @@ namespace eShopOnContainers.ViewModels
         private bool _isSubmittedOrder;
         private string _orderStatusText;
 
+        private int? _orderNumber;
+
+        public Order Order
+        {
+            get => _order;
+            set => SetProperty(ref _order, value);
+        }
+
+        public bool IsSubmittedOrder
+        {
+            get => _isSubmittedOrder;
+            set => SetProperty(ref _isSubmittedOrder, value);
+        }
+
+        public string OrderStatusText
+        {
+            get => _orderStatusText;
+            set => SetProperty(ref _orderStatusText, value);
+        }
+
+        public ICommand ToggleCancelOrderCommand { get; }
+
         public OrderDetailViewModel(
             IAppEnvironmentService appEnvironmentService,
             IDialogService dialogService, INavigationService navigationService, ISettingsService settingsService)
@@ -28,52 +51,26 @@ namespace eShopOnContainers.ViewModels
         {
             _appEnvironmentService = appEnvironmentService;
             _settingsService = settingsService;
+
+            ToggleCancelOrderCommand = new AsyncRelayCommand(ToggleCancelOrderAsync);
         }
 
-        public Order Order
+        public override void ApplyQueryAttributes(IDictionary<string, object> query)
         {
-            get => _order;
-            set
-            {
-                _order = value;
-                RaisePropertyChanged(() => Order);
-            }
+            base.ApplyQueryAttributes(query);
+
+            query.ValueAsInt(nameof(Order.OrderNumber), ref _orderNumber);
         }
 
-        public bool IsSubmittedOrder
+        public override async Task InitializeAsync ()
         {
-            get => _isSubmittedOrder;
-            set
-            {
-                _isSubmittedOrder = value;
-                RaisePropertyChanged(() => IsSubmittedOrder);
-            }
-        }
-
-        public string OrderStatusText
-        {
-            get => _orderStatusText;
-            set
-            {
-                _orderStatusText = value;
-                RaisePropertyChanged(() => OrderStatusText);
-            }
-        }
-
-
-        public ICommand ToggleCancelOrderCommand => new Command(async () => await ToggleCancelOrderAsync());
-
-        public override async Task InitializeAsync (IDictionary<string, object> query)
-        {
-            var orderNumber = query.GetValueAsInt (nameof (Order.OrderNumber));
-
-            if (orderNumber.ContainsKeyAndValue)
+            if (_orderNumber.HasValue)
             {
                 IsBusy = true;
 
                 // Get order detail info
                 var authToken = _settingsService.AuthAccessToken;
-                Order = await _appEnvironmentService.OrderService.GetOrderAsync (orderNumber.Value, authToken);
+                Order = await _appEnvironmentService.OrderService.GetOrderAsync (_orderNumber.Value, authToken);
                 IsSubmittedOrder = Order.OrderStatus == OrderStatus.Submitted;
                 OrderStatusText = Order.OrderStatus.ToString ().ToUpper ();
 
