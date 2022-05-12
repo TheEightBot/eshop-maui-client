@@ -97,8 +97,6 @@ namespace eShopOnContainers.ViewModels
             IDialogService dialogService, INavigationService navigationService, ISettingsService settingsService)
             : base(dialogService, navigationService, settingsService)
         {
-            this.MultipleInitialization = true;
-
             _appEnvironmentService = appEnvironmentService;
             _settingsService = settingsService;
 
@@ -117,25 +115,25 @@ namespace eShopOnContainers.ViewModels
 
         public override async Task InitializeAsync ()
         {
-            IsBusy = true;
+            await IsBusyFor(
+                async () =>
+                {
+                    // Get Catalog, Brands and Types
+                    var products = await _appEnvironmentService.CatalogService.GetCatalogAsync ();
+                    var brands = await _appEnvironmentService.CatalogService.GetCatalogBrandAsync ();
+                    var types = await _appEnvironmentService.CatalogService.GetCatalogTypeAsync ();
 
-            // Get Catalog, Brands and Types
-            var products = await _appEnvironmentService.CatalogService.GetCatalogAsync ();
-            var brands = await _appEnvironmentService.CatalogService.GetCatalogBrandAsync ();
-            var types = await _appEnvironmentService.CatalogService.GetCatalogTypeAsync ();
+                    var authToken = _settingsService.AuthAccessToken;
+                    var userInfo = await _appEnvironmentService.UserService.GetUserInfoAsync (authToken);
 
-            var authToken = _settingsService.AuthAccessToken;
-            var userInfo = await _appEnvironmentService.UserService.GetUserInfoAsync (authToken);
+                    var basket = await _appEnvironmentService.BasketService.GetBasketAsync (userInfo.UserId, authToken);
 
-            var basket = await _appEnvironmentService.BasketService.GetBasketAsync (userInfo.UserId, authToken);
+                    BadgeCount = basket?.Items?.Count () ?? 0;
 
-            BadgeCount = basket?.Items?.Count () ?? 0;
-
-            _products.ReloadData(products);
-            _brands.ReloadData(brands);
-            _types.ReloadData(types);
-
-            IsBusy = false;
+                    _products.ReloadData(products);
+                    _brands.ReloadData(brands);
+                    _types.ReloadData(types);
+                });
         }
 
         private async void AddCatalogItem(CatalogItem catalogItem)
@@ -169,41 +167,31 @@ namespace eShopOnContainers.ViewModels
 
         private async Task FilterAsync()
         {
-            try
-            {    
-                IsBusy = true;
-
-                if (Brand != null && Type != null)
+            await IsBusyFor(
+                async () =>
                 {
-                    var filteredProducts = await _appEnvironmentService.CatalogService.FilterAsync(Brand.Id, Type.Id);
-                    _products.ReloadData(filteredProducts);
-                }
+                    if (Brand != null || Type != null)
+                    {
+                        var filteredProducts = await _appEnvironmentService.CatalogService.FilterAsync(Brand.Id, Type.Id);
+                        _products.ReloadData(filteredProducts);
+                    }
 
-                await NavigationService.PopAsync();
-            }
-            finally
-            {
-                IsBusy = false;
-            }
+                    await NavigationService.PopAsync();
+                });
         }
 
         private async Task ClearFilterAsync()
         {
-            try
-            {
-                IsBusy = true;
+            await IsBusyFor(
+                async () =>
+                {
+                    Brand = null;
+                    Type = null;
+                    var allProducts = await _appEnvironmentService.CatalogService.GetCatalogAsync();
+                    _products.ReloadData(allProducts);
 
-                Brand = null;
-                Type = null;
-                var allProducts = await _appEnvironmentService.CatalogService.GetCatalogAsync();
-                _products.ReloadData(allProducts);
-                 
-                await NavigationService.PopAsync(); 
-            }
-            finally
-            {
-                IsBusy = false;
-            }
+                    await NavigationService.PopAsync();
+                });
         }
 
         private Task ViewBasket()

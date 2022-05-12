@@ -20,10 +20,7 @@ namespace eShopOnContainers.ViewModels
     {
         private readonly IAppEnvironmentService _appEnvironmentService;
         private readonly ISettingsService _settingsService;
-
-        private int _badgeCount;
-        private ObservableCollectionEx<BasketItem> _basketItems;
-        private decimal _total;
+        private readonly ObservableCollectionEx<BasketItem> _basketItems;
 
         public int BadgeCount
         {
@@ -39,7 +36,6 @@ namespace eShopOnContainers.ViewModels
         public ObservableCollectionEx<BasketItem> BasketItems
         {
             get => _basketItems;
-            private set => SetProperty(ref _basketItems, value);
         }
 
         public ICommand AddCommand { get; }
@@ -56,7 +52,7 @@ namespace eShopOnContainers.ViewModels
             _appEnvironmentService = appEnvironmentService;
             _settingsService = settingsService;
 
-            BasketItems = new ObservableCollectionEx<BasketItem> ();
+            _basketItems = new ObservableCollectionEx<BasketItem> ();
 
             AddCommand = new AsyncRelayCommand<BasketItem>(AddBasketItemAsync);
             DeleteCommand = new AsyncRelayCommand<BasketItem>(DeleteBasketItemAsync);

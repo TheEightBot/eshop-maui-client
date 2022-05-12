@@ -1,4 +1,4 @@
-﻿using eShopOnContainers.Extensions;
+using eShopOnContainers.Extensions;
 using eShopOnContainers.Models.Orders;
 using eShopOnContainers.Models.User;
 using eShopOnContainers.Services.Order;
@@ -57,27 +57,37 @@ namespace eShopOnContainers.ViewModels
                
         public override async Task InitializeAsync ()
         {
-            IsBusy = true;
-
-            // Get orders
-            var authToken = _settingsService.AuthAccessToken;
-            var orders = await _appEnvironmentService.OrderService.GetOrdersAsync (authToken);
-
-            _orders.ReloadData(orders);
-
-            IsBusy = false;
+            await LoadOrdersAsync();
         }
 
         private async Task LogoutAsync()
         {
-            IsBusy = true;
+            await IsBusyFor(
+                async () =>
+                {
+                    // Logout
+                    await NavigationService.NavigateToAsync(
+                        "//Login",
+                        new Dictionary<string, object> { { "Logout", true } });
+                });
+        }
 
-            // Logout
-            await NavigationService.NavigateToAsync(
-                "//Login",
-                new Dictionary<string, object> { { "Logout", true } });
+        private async Task LoadOrdersAsync ()
+        {
+            if (IsBusy)
+            {
+                return;
+            }
 
-            IsBusy = false;
+            await IsBusyFor(
+                async () =>
+                {
+                    // Get orders
+                    var authToken = _settingsService.AuthAccessToken;
+                    var orders = await _appEnvironmentService.OrderService.GetOrdersAsync(authToken);
+
+                    _orders.ReloadData(orders);
+                });
         }
 
         private async Task OrderDetailAsync(Order order)

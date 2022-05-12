@@ -21,13 +21,6 @@ namespace eShopOnContainers.ViewModels
             SettingsCommand = new AsyncRelayCommand(SettingsAsync);
         }
 
-        public override Task InitializeAsync()
-        {
-            IsBusy = true;
-
-            return base.InitializeAsync();
-        }
-
         private async Task SettingsAsync()
         {
             await NavigationService.NavigateToAsync("Settings");

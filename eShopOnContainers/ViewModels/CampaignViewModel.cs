@@ -42,11 +42,13 @@ namespace eShopOnContainers.ViewModels
 
         public override async Task InitializeAsync ()
         {
-            IsBusy = true;
-            // Get campaigns by user
-            var campaigns = await _appEnvironmentService.CampaignService.GetAllCampaignsAsync (_settingsService.AuthAccessToken);
-            _campaigns.ReloadData(campaigns);
-            IsBusy = false;
+            await IsBusyFor(
+                async () =>
+                {
+                    // Get campaigns by user
+                    var campaigns = await _appEnvironmentService.CampaignService.GetAllCampaignsAsync (_settingsService.AuthAccessToken);
+                    _campaigns.ReloadData(campaigns);
+                });
         }
 
         private async Task GetCampaignDetailsAsync(CampaignItem campaign)

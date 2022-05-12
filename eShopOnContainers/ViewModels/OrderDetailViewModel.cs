@@ -1,4 +1,4 @@
-﻿using eShopOnContainers.Extensions;
+using eShopOnContainers.Extensions;
 using eShopOnContainers.Models.Orders;
 using eShopOnContainers.Services.Order;
 using eShopOnContainers.Services.Settings;
@@ -64,18 +64,15 @@ namespace eShopOnContainers.ViewModels
 
         public override async Task InitializeAsync ()
         {
-            if (_orderNumber.HasValue)
-            {
-                IsBusy = true;
-
-                // Get order detail info
-                var authToken = _settingsService.AuthAccessToken;
-                Order = await _appEnvironmentService.OrderService.GetOrderAsync (_orderNumber.Value, authToken);
-                IsSubmittedOrder = Order.OrderStatus == OrderStatus.Submitted;
-                OrderStatusText = Order.OrderStatus.ToString ().ToUpper ();
-
-                IsBusy = false;
-            }
+            await IsBusyFor(
+                async () =>
+                {
+                    // Get order detail info
+                    var authToken = _settingsService.AuthAccessToken;
+                    Order = await _appEnvironmentService.OrderService.GetOrderAsync (OrderNumber, authToken);
+                    IsSubmittedOrder = Order.OrderStatus == OrderStatus.Submitted;
+                    OrderStatusText = Order.OrderStatus.ToString ().ToUpper ();
+                });
         }
 
         private async Task ToggleCancelOrderAsync()

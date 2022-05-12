@@ -1,4 +1,4 @@
-﻿using eShopOnContainers.Extensions;
+using eShopOnContainers.Extensions;
 using eShopOnContainers.Models.User;
 using eShopOnContainers.Services.Identity;
 using eShopOnContainers.Services.OpenUrl;
@@ -123,50 +123,52 @@ namespace eShopOnContainers.ViewModels
 
         private async Task MockSignInAsync()
         {
-            IsBusy = true;
-            IsValid = true;
-            bool isValid = Validate();
-            bool isAuthenticated = false;
-
-            if (isValid)
-            {
-                try
+            await IsBusyFor(
+                async () =>
                 {
-                    await Task.Delay(10);
+                    IsValid = true;
+                    bool isValid = Validate();
+                    bool isAuthenticated = false;
 
-                    isAuthenticated = true;
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine($"[SignIn] Error signing in: {ex}");
-                }
-            }
-            else
-            {
-                IsValid = false;
-            }
+                    if (isValid)
+                    {
+                        try
+                        {
+                            await Task.Delay(10);
 
-            if (isAuthenticated)
-            {
-                _settingsService.AuthAccessToken = GlobalSetting.Instance.AuthToken;
+                            isAuthenticated = true;
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine($"[SignIn] Error signing in: {ex}");
+                        }
+                    }
+                    else
+                    {
+                        IsValid = false;
+                    }
 
-                await NavigationService.NavigateToAsync ("//Main/Catalog");
-            }
+                    if (isAuthenticated)
+                    {
+                        _settingsService.AuthAccessToken = GlobalSetting.Instance.AuthToken;
 
-            IsBusy = false;
+                        await NavigationService.NavigateToAsync ("//Main/Catalog");
+                    }
+                });
         }
 
         private async Task SignInAsync()
         {
-            IsBusy = true;
+            await IsBusyFor(
+                async () =>
+                {
+                    await Task.Delay(10);
 
-            await Task.Delay(10);
+                    LoginUrl = _identityService.CreateAuthorizationRequest();
 
-            LoginUrl = _identityService.CreateAuthorizationRequest();
-
-            IsValid = true;
-            IsLogin = true;
-            IsBusy = false;
+                    IsValid = true;
+                    IsLogin = true;
+                });
         }
 
         private Task RegisterAsync()
