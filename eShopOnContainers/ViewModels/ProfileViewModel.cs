@@ -43,8 +43,6 @@ namespace eShopOnContainers.ViewModels
             IDialogService dialogService, INavigationService navigationService, ISettingsService settingsService)
             : base(dialogService, navigationService, settingsService)
         {
-            this.MultipleInitialization = true;
-
             _appEnvironmentService = appEnvironmentService;
             _settingsService = settingsService;
 
