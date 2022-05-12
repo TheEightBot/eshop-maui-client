@@ -6,7 +6,6 @@ namespace eShopOnContainers.Views
 	[ContentProperty(nameof(Content))]
 	public class BadgeView : Grid
 	{
-		private Grid _control;
 		private ContentPresenter _badgeContent;
 		private Border _border;
 		private RoundRectangle _borderShape;
@@ -121,15 +120,6 @@ namespace eShopOnContainers.Views
 			UpdateLayout();
 		}
 
-		protected override void OnChildAdded(Element child)
-		{
-			if (_control == null && child is Grid control)
-			{
-			}
-
-			base.OnChildAdded(child);
-		}
-
 		protected override void OnHandlerChanging(HandlerChangingEventArgs args)
 		{
 			base.OnHandlerChanging(args);
@@ -145,7 +135,6 @@ namespace eShopOnContainers.Views
         private void BadgeIndicatorSizeChanged(object sender, EventArgs e)
         {
 			_border.MinimumWidthRequest = _border.Height;
-
 			_borderShape.CornerRadius = _border.Height * .5f;
         }
 
