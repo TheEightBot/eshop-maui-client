@@ -16,6 +16,6 @@ namespace eShopOnContainers.ViewModels.Base
 
         public bool IsBusy { get; set; }
 
-        Task InitializeAsync(IDictionary<string, object> query);
+        Task InitializeAsync();
     }
 }

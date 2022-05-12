@@ -1,55 +1,40 @@
-﻿using eShopOnContainers.Services.Settings;
-using eShopOnContainers.Views.Templates;
+﻿using System;
+using CommunityToolkit.Mvvm.ComponentModel;
 using eShopOnContainers.Services;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.Maui;
+using eShopOnContainers.Services.Settings;
 
 namespace eShopOnContainers.ViewModels.Base
 {
-    public abstract class ViewModelBase : ExtendedBindableObject, IQueryAttributable
+    public abstract class ViewModelBase : ObservableObject, IViewModelBase
     {
-        public IDialogService DialogService { get; private set; }
-        public INavigationService NavigationService { get; private set; }
-        public ISettingsService SettingsService { get; private set; }
+        private readonly SemaphoreSlim _isBusyLock = new SemaphoreSlim(1, 1);
 
         private bool _isInitialized;
+        private bool _multipleInitialization;
+        private bool _isBusy;
+
+        public IDialogService DialogService { get; private set; }
+
+        public INavigationService NavigationService { get; private set; }
+
+        public ISettingsService SettingsService { get; private set; }
 
         public bool IsInitialized
         {
             get => _isInitialized;
-
-            set
-            {
-                _isInitialized = value;
-                OnPropertyChanged(nameof(IsInitialized));
-            }
+            set => SetProperty(ref _isInitialized, value);
         }
-
-        private bool _multipleInitialization;
 
         public bool MultipleInitialization
         {
             get => _multipleInitialization;
-
-            set
-            {
-                _multipleInitialization = value;
-                OnPropertyChanged(nameof(MultipleInitialization));
-            }
+            set => SetProperty(ref _multipleInitialization, value);
         }
-
-        private bool _isBusy;
 
         public bool IsBusy
         {
             get => _isBusy;
-
-            set
-            {
-                _isBusy = value;
-                OnPropertyChanged(nameof(IsBusy));
-            }
+            set => SetProperty(ref _isBusy, value);
         }
 
         public ViewModelBase(IDialogService dialogService, INavigationService navigationService, ISettingsService settingsService)
@@ -63,18 +48,31 @@ namespace eShopOnContainers.ViewModels.Base
             GlobalSetting.Instance.BaseGatewayMarketingEndpoint = SettingsService.GatewayMarketingEndpointBase;
         }
 
-        public virtual Task InitializeAsync (IDictionary<string, object> query)
+        public virtual void ApplyQueryAttributes(IDictionary<string, object> query)
         {
-            return Task.FromResult (false);
         }
 
-        public async void ApplyQueryAttributes (IDictionary<string, object> query)
+        public virtual Task InitializeAsync()
         {
-            if(!IsInitialized)
+            return Task.CompletedTask;
+        }
+
+        public async Task IsBusyFor(Func<Task> unitOfWork)
+        {
+            await _isBusyLock.WaitAsync();
+
+            try
             {
-                IsInitialized = true;
-                await InitializeAsync (query);
+                IsBusy = true;
+
+                await unitOfWork();
+            }
+            finally
+            {
+                IsBusy = false;
+                _isBusyLock.Release();
             }
         }
     }
 }
+

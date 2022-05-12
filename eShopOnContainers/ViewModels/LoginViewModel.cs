@@ -18,29 +18,31 @@ using System.ComponentModel;
 
 namespace eShopOnContainers.ViewModels
 {
-    public class LoginViewModel : ObservableViewModelBase
+    public class LoginViewModel : ViewModelBase
     {
-        private ValidatableObject<string> _userName;
-        private ValidatableObject<string> _password;
+
+        private readonly ISettingsService _settingsService;
+        private readonly IOpenUrlService _openUrlService;
+        private readonly IIdentityService _identityService;
+
+        private readonly ValidatableObject<string> _userName;
+        private readonly ValidatableObject<string> _password;
+
         private bool _isMock;
         private bool _isValid;
         private bool _isLogin;
         private string _authUrl;
 
-        private ISettingsService _settingsService;
-        private IOpenUrlService _openUrlService;
-        private IIdentityService _identityService;
+        private bool? _logout;
 
         public ValidatableObject<string> UserName
         {
             get => _userName;
-            private set => SetProperty(ref _userName, value);
         }
 
         public ValidatableObject<string> Password
         {
             get => _password;
-            private set  => SetProperty(ref _password, value);
         }
 
         public bool IsMock
@@ -88,8 +90,8 @@ namespace eShopOnContainers.ViewModels
             _openUrlService = openUrlService;
             _identityService = identityService;
 
-            UserName = new ValidatableObject<string>();
-            Password = new ValidatableObject<string>();
+            _userName = new ValidatableObject<string>();
+            _password = new ValidatableObject<string>();
 
             MockSignInCommand = new AsyncRelayCommand(MockSignInAsync);
             SignInCommand = new AsyncRelayCommand(SignInAsync);
@@ -101,12 +103,17 @@ namespace eShopOnContainers.ViewModels
             InvalidateMock();
             AddValidations();
         }
-                
-        public override Task InitializeAsync (IDictionary<string, object> query)
-        {
-            var logout = query.GetValueAsBool ("Logout");
 
-            if(logout.ContainsKeyAndValue && logout.Value == true)
+        public override void ApplyQueryAttributes(IDictionary<string, object> query)
+        {
+            base.ApplyQueryAttributes(query);
+
+            query.ValueAsBool ("Logout", ref _logout);
+        }
+
+        public override Task InitializeAsync ()
+        {
+            if(_logout.HasValue && _logout.Value == true)
             {
                 Logout ();
             }

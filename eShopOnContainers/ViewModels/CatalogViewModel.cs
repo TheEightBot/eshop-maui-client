@@ -14,26 +14,27 @@ using Microsoft.Maui;
 using eShopOnContainers.Services;
 using eShopOnContainers.Services.AppEnvironment;
 using eShopOnContainers.Extensions;
+using CommunityToolkit.Mvvm.Input;
 
 namespace eShopOnContainers.ViewModels
 {
-    public class CatalogViewModel : ObservableViewModelBase
+    public class CatalogViewModel : ViewModelBase
     {
-        private ObservableCollectionEx<CatalogItem> _products;
-        private ObservableCollectionEx<CatalogBrand> _brands;
-        private ObservableCollectionEx<CatalogType> _types;
+        private readonly IAppEnvironmentService _appEnvironmentService;
+        private readonly ISettingsService _settingsService;
+
+        private readonly ObservableCollectionEx<CatalogItem> _products;
+        private readonly ObservableCollectionEx<CatalogBrand> _brands;
+        private readonly ObservableCollectionEx<CatalogType> _types;
 
         private CatalogItem _selectedProduct;
         private CatalogBrand _brand;
         private CatalogType _type;
         private int _badgeCount;
-        private IAppEnvironmentService _appEnvironmentService;
-        private ISettingsService _settingsService;
 
-        public ObservableCollectionEx<CatalogItem> Products
+        public IList<CatalogItem> Products
         {
             get => _products;
-            private set => SetProperty(ref _products, value);
         }
 
         public CatalogItem SelectedProduct
@@ -42,10 +43,9 @@ namespace eShopOnContainers.ViewModels
             set => SetProperty(ref _selectedProduct, value);
         }
 
-        public ObservableCollectionEx<CatalogBrand> Brands
+        public IEnumerable<CatalogBrand> Brands
         {
             get => _brands;
-            set => SetProperty(ref _brands, value);
         }
 
         public CatalogBrand Brand
@@ -58,10 +58,9 @@ namespace eShopOnContainers.ViewModels
             }
         }
 
-        public ObservableCollectionEx<CatalogType> Types
+        public IEnumerable<CatalogType> Types
         {
             get => _types;
-            set => SetProperty(ref _types, value);
         }
 
         public CatalogType Type
@@ -74,14 +73,24 @@ namespace eShopOnContainers.ViewModels
             }
         }
 
-
         public int BadgeCount
         {
             get => _badgeCount;
             set => SetProperty(ref _badgeCount, value);
         }
 
-        public bool IsFilter { get { return Brand != null || Type != null; } }
+        public bool IsFilter
+        {
+            get => Brand != null || Type != null;
+        }
+
+        public ICommand AddCatalogItemCommand { get; }
+
+        public ICommand FilterCommand { get; }
+
+        public ICommand ClearFilterCommand { get; }
+
+        public ICommand ViewBasketCommand { get; }
 
         public CatalogViewModel(
             IAppEnvironmentService appEnvironmentService,
@@ -93,20 +102,20 @@ namespace eShopOnContainers.ViewModels
             _appEnvironmentService = appEnvironmentService;
             _settingsService = settingsService;
 
-            Products = new ObservableCollectionEx<CatalogItem>();
-            Brands = new ObservableCollectionEx<CatalogBrand>();
-            Types = new ObservableCollectionEx<CatalogType>();
+            _products = new ObservableCollectionEx<CatalogItem>();
+            _brands = new ObservableCollectionEx<CatalogBrand>();
+            _types = new ObservableCollectionEx<CatalogType>();
+
+            AddCatalogItemCommand = new RelayCommand<CatalogItem>(AddCatalogItem);
+
+            FilterCommand = new AsyncRelayCommand(FilterAsync);
+
+            ClearFilterCommand = new AsyncRelayCommand(ClearFilterAsync);
+
+            ViewBasketCommand = new AsyncRelayCommand(ViewBasket);
         }
 
-        public ICommand AddCatalogItemCommand => new Command<CatalogItem>(AddCatalogItem);
-
-        public ICommand FilterCommand => new Command(async () => await FilterAsync());
-
-		public ICommand ClearFilterCommand => new Command(async () => await ClearFilterAsync());
-
-        public ICommand ViewBasketCommand => new Command (async () => await ViewBasket ());
-
-        public override async Task InitializeAsync (IDictionary<string, object> query)
+        public override async Task InitializeAsync ()
         {
             IsBusy = true;
 

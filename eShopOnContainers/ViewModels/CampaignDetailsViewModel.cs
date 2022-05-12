@@ -9,6 +9,7 @@ using System.Windows.Input;
 using Microsoft.Maui;
 using eShopOnContainers.Services;
 using eShopOnContainers.Services.AppEnvironment;
+using CommunityToolkit.Mvvm.Input;
 
 namespace eShopOnContainers.ViewModels
 {
@@ -20,7 +21,9 @@ namespace eShopOnContainers.ViewModels
         private CampaignItem _campaign;
         private bool _isDetailsSite;
 
-        public ICommand EnableDetailsSiteCommand => new Command(EnableDetailsSite);
+        public ICommand EnableDetailsSiteCommand { get; }
+
+        private int? _campaignId;
 
         public CampaignDetailsViewModel(
             IAppEnvironmentService appEnvironmentService,
@@ -29,39 +32,40 @@ namespace eShopOnContainers.ViewModels
         {
             _appEnvironmentService = appEnvironmentService;
             _settingsService = settingsService;
+
+            EnableDetailsSiteCommand = new RelayCommand(EnableDetailsSite);
         }
 
         public CampaignItem Campaign
         {
             get => _campaign;
-            set
-            {
-                _campaign = value;
-                RaisePropertyChanged(() => Campaign);
-            }
+            set => SetProperty(ref _campaign, value);
         }
 
         public bool IsDetailsSite
         {
             get => _isDetailsSite;
-            set
-            {
-                _isDetailsSite = value;
-                RaisePropertyChanged(() => IsDetailsSite);
-            }
+            set => SetProperty(ref _isDetailsSite, value);
         }
 
-        public override async Task InitializeAsync (IDictionary<string, object> query)
+        public override void ApplyQueryAttributes(IDictionary<string, object> query)
         {
-            var campaignId = query.GetValueAsInt (nameof (Campaign.Id));
+            base.ApplyQueryAttributes(query);
 
-            if (campaignId.ContainsKeyAndValue)
-            {
-                IsBusy = true;
-                // Get campaign by id
-                Campaign = await _appEnvironmentService.CampaignService.GetCampaignByIdAsync(campaignId.Value, _settingsService.AuthAccessToken);
-                IsBusy = false;
-            }
+            query.ValueAsInt(nameof(Campaign.Id), ref _campaignId);
+        }
+
+        public override async Task InitializeAsync ()
+        {
+            await IsBusyFor(
+                async () =>
+                {
+                    if (_campaignId.HasValue)
+                    {
+                        // Get campaign by id
+                        Campaign = await _appEnvironmentService.CampaignService.GetCampaignByIdAsync(_campaignId.Value, _settingsService.AuthAccessToken);
+                    }
+                });
         }
 
         private void EnableDetailsSite()

@@ -15,19 +15,33 @@ using System.Windows.Input;
 using Microsoft.Maui;
 using eShopOnContainers.Services;
 using eShopOnContainers.Services.AppEnvironment;
+using CommunityToolkit.Mvvm.Input;
 
 namespace eShopOnContainers.ViewModels
 {
     public class CheckoutViewModel : ViewModelBase
     {
-        private ObservableCollection<BasketItem> _orderItems;
-        private Order _order;
-        private Address _shippingAddress;
-
         private readonly ISettingsService _settingsService;
         private readonly IAppEnvironmentService _appEnvironmentService;
 
         private readonly BasketViewModel _basketViewModel;
+
+        private Order _order;
+        private Address _shippingAddress;
+
+        public Order Order
+        {
+            get => _order;
+            set => SetProperty(ref _order, value);
+        }
+
+        public Address ShippingAddress
+        {
+            get => _shippingAddress;
+            set => SetProperty(ref _shippingAddress, value);
+        }
+
+        public ICommand CheckoutCommand { get; }
 
         public CheckoutViewModel(
             IAppEnvironmentService appEnvironmentService,
@@ -39,46 +53,15 @@ namespace eShopOnContainers.ViewModels
             _settingsService = settingsService;
 
             _basketViewModel = basketViewModel;
-        }
 
-        public ObservableCollection<BasketItem> OrderItems
-        {
-            get => _orderItems;
-            set
-            {
-                _orderItems = value;
-                RaisePropertyChanged(() => OrderItems);
-            }
-        }
+            CheckoutCommand = new AsyncRelayCommand(CheckoutAsync);
+        }       
 
-        public Order Order
-        {
-            get => _order;
-            set
-            {
-                _order = value;
-                RaisePropertyChanged(() => Order);
-            }
-        }
-
-        public Address ShippingAddress
-        {
-            get => _shippingAddress;
-            set
-            {
-                _shippingAddress = value;
-                RaisePropertyChanged(() => ShippingAddress);
-            }
-        }
-
-        public ICommand CheckoutCommand => new Command(async () => await CheckoutAsync());
-
-        public override async Task InitializeAsync (IDictionary<string, object> query)
+        public override async Task InitializeAsync ()
         {
             IsBusy = true;
 
             var basketItems = _appEnvironmentService.BasketService.LocalBasketItems;
-            OrderItems = new ObservableCollection<BasketItem>(basketItems);
 
             var authToken = _settingsService.AuthAccessToken;
             var userInfo = await _appEnvironmentService.UserService.GetUserInfoAsync (authToken);
@@ -132,7 +115,7 @@ namespace eShopOnContainers.ViewModels
 
                 // Create the OrderNumber
                 Order.OrderNumber = orders.Count() + 1;
-                RaisePropertyChanged (() => Order);
+                OnPropertyChanged (nameof(Order));
             }
 
             IsBusy = false;
@@ -159,7 +142,7 @@ namespace eShopOnContainers.ViewModels
                 await _appEnvironmentService.BasketService.ClearBasketAsync(_shippingAddress.Id.ToString(), authToken);
 
                 // Reset Basket badge
-                _basketViewModel.BadgeCount = 0;
+                _basketViewModel.ClearBasketItems();
 
                 // Navigate to Orders
                 await NavigationService.NavigateToAsync("//Main/Catalog");

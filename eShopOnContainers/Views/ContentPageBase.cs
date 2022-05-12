@@ -11,16 +11,14 @@ namespace eShopOnContainers.Views
             NavigationPage.SetBackButtonTitle (this, string.Empty);
         }
 
-        protected override async void OnAppearing ()
+        protected override async void OnAppearing()
         {
-            base.OnAppearing ();
+            base.OnAppearing();
 
-            if (BindingContext is ViewModelBase vmb)
+            if (BindingContext is IViewModelBase ivmb && (!ivmb.IsInitialized || ivmb.MultipleInitialization))
             {
-                if (!vmb.IsInitialized || vmb.MultipleInitialization)
-                {
-                    await vmb.InitializeAsync (null);
-                }
+                ivmb.IsInitialized = true;
+                await ivmb.InitializeAsync();
             }
         }
     }
