@@ -43,7 +43,7 @@ namespace eShopOnContainers.Views
 
         public async Task AnimateIn()
         {
-			if (Device.RuntimePlatform == Device.WinUI)
+			if (DeviceInfo.Platform == DevicePlatform.WinUI)
             {
                 return;
             }
