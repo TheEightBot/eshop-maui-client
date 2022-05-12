@@ -1,4 +1,4 @@
-using eShopOnContainers.Extensions;
+﻿using eShopOnContainers.Extensions;
 using eShopOnContainers.Models.Orders;
 using eShopOnContainers.Models.User;
 using eShopOnContainers.Services.Order;
@@ -34,8 +34,8 @@ namespace eShopOnContainers.ViewModels
             set => SetProperty(ref _selectedOrder, value);
         }
 
+        public ICommand RefreshCommand { get; }
         public ICommand LogoutCommand { get; }
-
         public ICommand OrderDetailCommand { get; }
 
         public ProfileViewModel(
@@ -48,8 +48,8 @@ namespace eShopOnContainers.ViewModels
 
             _orders = new ObservableCollectionEx<Order>();
 
+            RefreshCommand = new AsyncRelayCommand(LoadOrdersAsync);
             LogoutCommand = new AsyncRelayCommand(LogoutAsync);
-
             OrderDetailCommand = new AsyncRelayCommand<Order>(OrderDetailAsync);
         }
                
