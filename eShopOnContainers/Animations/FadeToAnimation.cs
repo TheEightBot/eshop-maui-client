@@ -66,13 +66,9 @@ namespace eShopOnContainers.Animations
                 throw new NullReferenceException("Null Target property.");
             }
 
-            return Task.Run(() =>
-            {
-                Device.BeginInvokeOnMainThread(() =>
-                {
-                    Target.Animate("FadeIn", FadeIn(), 16, Convert.ToUInt32(Duration));
-                });
-            });
+            Target.Dispatcher.Dispatch(() => Target.Animate("FadeIn", FadeIn(), 16, Convert.ToUInt32(Duration)));
+
+            return Task.CompletedTask;
         }
 
         protected override Task ResetAnimation()
@@ -82,7 +78,9 @@ namespace eShopOnContainers.Animations
                 throw new NullReferenceException("Null Target property.");
             }
 
-            return Target.FadeTo(0, 0, null);
+            Target.Dispatcher.Dispatch(() => Target.FadeTo(0, 0, null));
+
+            return Task.CompletedTask;
         }
 
         internal Animation FadeIn()
@@ -126,13 +124,9 @@ namespace eShopOnContainers.Animations
                 throw new NullReferenceException("Null Target property.");
             }
 
-            return Task.Run(() =>
-            {
-                Device.BeginInvokeOnMainThread(() =>
-                {
-                    Target.Animate("FadeOut", FadeOut(), 16, Convert.ToUInt32(Duration));
-                });
-            });
+            Target.Dispatcher.Dispatch(() => Target.Animate("FadeOut", FadeOut(), 16, Convert.ToUInt32(Duration)));
+
+            return Task.CompletedTask;
         }
 
         protected override Task ResetAnimation()
@@ -142,7 +136,9 @@ namespace eShopOnContainers.Animations
                 throw new NullReferenceException("Null Target property.");
             }
 
-            return Target.FadeTo(0, 0, null);
+            Target.Dispatcher.Dispatch(() => Target.FadeTo(0, 0, null));
+
+            return Task.CompletedTask;
         }
 
         internal Animation FadeOut()
