@@ -10,7 +10,6 @@ namespace eShopOnContainers.ViewModels.Base
         private readonly SemaphoreSlim _isBusyLock = new SemaphoreSlim(1, 1);
 
         private bool _isInitialized;
-        private bool _multipleInitialization;
         private bool _isBusy;
 
         public IDialogService DialogService { get; private set; }
