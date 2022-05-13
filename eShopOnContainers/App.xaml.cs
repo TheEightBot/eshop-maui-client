@@ -89,10 +89,7 @@ namespace eShopOnContainers
 
         private void App_RequestedThemeChanged(object sender, AppThemeChangedEventArgs e)
         {
-            MainThread.BeginInvokeOnMainThread(() =>
-            {
-                SetStatusBar();
-            });
+            Dispatcher.Dispatch(() => SetStatusBar());
         }
 
         void SetStatusBar()

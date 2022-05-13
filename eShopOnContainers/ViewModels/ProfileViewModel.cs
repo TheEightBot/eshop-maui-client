@@ -34,8 +34,8 @@ namespace eShopOnContainers.ViewModels
             set => SetProperty(ref _selectedOrder, value);
         }
 
+        public ICommand RefreshCommand { get; }
         public ICommand LogoutCommand { get; }
-
         public ICommand OrderDetailCommand { get; }
 
         public ProfileViewModel(
@@ -43,41 +43,49 @@ namespace eShopOnContainers.ViewModels
             IDialogService dialogService, INavigationService navigationService, ISettingsService settingsService)
             : base(dialogService, navigationService, settingsService)
         {
-            this.MultipleInitialization = true;
-
             _appEnvironmentService = appEnvironmentService;
             _settingsService = settingsService;
 
             _orders = new ObservableCollectionEx<Order>();
 
+            RefreshCommand = new AsyncRelayCommand(LoadOrdersAsync);
             LogoutCommand = new AsyncRelayCommand(LogoutAsync);
-
             OrderDetailCommand = new AsyncRelayCommand<Order>(OrderDetailAsync);
         }
                
         public override async Task InitializeAsync ()
         {
-            IsBusy = true;
-
-            // Get orders
-            var authToken = _settingsService.AuthAccessToken;
-            var orders = await _appEnvironmentService.OrderService.GetOrdersAsync (authToken);
-
-            _orders.ReloadData(orders);
-
-            IsBusy = false;
+            await LoadOrdersAsync();
         }
 
         private async Task LogoutAsync()
         {
-            IsBusy = true;
+            await IsBusyFor(
+                async () =>
+                {
+                    // Logout
+                    await NavigationService.NavigateToAsync(
+                        "//Login",
+                        new Dictionary<string, object> { { "Logout", true } });
+                });
+        }
 
-            // Logout
-            await NavigationService.NavigateToAsync(
-                "//Login",
-                new Dictionary<string, object> { { "Logout", true } });
+        private async Task LoadOrdersAsync ()
+        {
+            if (IsBusy)
+            {
+                return;
+            }
 
-            IsBusy = false;
+            await IsBusyFor(
+                async () =>
+                {
+                    // Get orders
+                    var authToken = _settingsService.AuthAccessToken;
+                    var orders = await _appEnvironmentService.OrderService.GetOrdersAsync(authToken);
+
+                    _orders.ReloadData(orders);
+                });
         }
 
         private async Task OrderDetailAsync(Order order)

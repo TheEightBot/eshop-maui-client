@@ -15,7 +15,7 @@ namespace eShopOnContainers.Views
         {
             base.OnAppearing();
 
-            if (BindingContext is IViewModelBase ivmb && (!ivmb.IsInitialized || ivmb.MultipleInitialization))
+            if (BindingContext is IViewModelBase ivmb && !ivmb.IsInitialized)
             {
                 ivmb.IsInitialized = true;
                 await ivmb.InitializeAsync();

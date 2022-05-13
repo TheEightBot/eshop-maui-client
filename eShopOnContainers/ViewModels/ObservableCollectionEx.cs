@@ -33,7 +33,7 @@ namespace eShopOnContainers.ViewModels
 
         public void ReloadData(Action<IList<T>> innerListAction)
         {
-            this.Clear();
+            Items.Clear();
 
             innerListAction(Items);
 
@@ -44,7 +44,7 @@ namespace eShopOnContainers.ViewModels
 
         public async Task ReloadDataAsync (Func<IList<T>, Task> innerListAction)
         {
-            this.Clear();
+            Items.Clear();
 
             await innerListAction(Items);
 

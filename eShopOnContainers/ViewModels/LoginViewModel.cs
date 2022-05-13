@@ -33,8 +33,6 @@ namespace eShopOnContainers.ViewModels
         private bool _isLogin;
         private string _authUrl;
 
-        private bool? _logout;
-
         public ValidatableObject<string> UserName
         {
             get => _userName;
@@ -108,65 +106,65 @@ namespace eShopOnContainers.ViewModels
         {
             base.ApplyQueryAttributes(query);
 
-            query.ValueAsBool ("Logout", ref _logout);
+            if(query.ValueAsBool("Logout", out var logout) && logout == true)
+            {
+                PerformLogout ();
+            }
         }
 
         public override Task InitializeAsync ()
         {
-            if(_logout.HasValue && _logout.Value == true)
-            {
-                Logout ();
-            }
-
             return Task.CompletedTask;
         }
 
         private async Task MockSignInAsync()
         {
-            IsBusy = true;
-            IsValid = true;
-            bool isValid = Validate();
-            bool isAuthenticated = false;
-
-            if (isValid)
-            {
-                try
+            await IsBusyFor(
+                async () =>
                 {
-                    await Task.Delay(10);
+                    IsValid = true;
+                    bool isValid = Validate();
+                    bool isAuthenticated = false;
 
-                    isAuthenticated = true;
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine($"[SignIn] Error signing in: {ex}");
-                }
-            }
-            else
-            {
-                IsValid = false;
-            }
+                    if (isValid)
+                    {
+                        try
+                        {
+                            await Task.Delay(10);
 
-            if (isAuthenticated)
-            {
-                _settingsService.AuthAccessToken = GlobalSetting.Instance.AuthToken;
+                            isAuthenticated = true;
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine($"[SignIn] Error signing in: {ex}");
+                        }
+                    }
+                    else
+                    {
+                        IsValid = false;
+                    }
 
-                await NavigationService.NavigateToAsync ("//Main/Catalog");
-            }
+                    if (isAuthenticated)
+                    {
+                        _settingsService.AuthAccessToken = GlobalSetting.Instance.AuthToken;
 
-            IsBusy = false;
+                        await NavigationService.NavigateToAsync ("//Main/Catalog");
+                    }
+                });
         }
 
         private async Task SignInAsync()
         {
-            IsBusy = true;
+            await IsBusyFor(
+                async () =>
+                {
+                    await Task.Delay(10);
 
-            await Task.Delay(10);
+                    LoginUrl = _identityService.CreateAuthorizationRequest();
 
-            LoginUrl = _identityService.CreateAuthorizationRequest();
-
-            IsValid = true;
-            IsLogin = true;
-            IsBusy = false;
+                    IsValid = true;
+                    IsLogin = true;
+                });
         }
 
         private Task RegisterAsync()
@@ -174,7 +172,7 @@ namespace eShopOnContainers.ViewModels
             return _openUrlService.OpenUrl(GlobalSetting.Instance.RegisterWebsite);
         }
 
-        private void Logout()
+        private void PerformLogout()
         {
             var authIdToken = _settingsService.AuthIdToken;
             var logoutRequest = _identityService.CreateLogoutRequest(authIdToken);
@@ -192,6 +190,9 @@ namespace eShopOnContainers.ViewModels
             }
 
             _settingsService.UseFakeLocation = false;
+
+            UserName.Value = string.Empty;
+            Password.Value = string.Empty;
         }
 
         private async Task NavigateAsync(string url)

@@ -13,6 +13,8 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace eShopOnContainers.ViewModels
 {
+
+    [QueryProperty(nameof(OrderNumber), nameof(Models.Orders.Order.OrderNumber))]
     public class OrderDetailViewModel : ViewModelBase
     {
         private readonly ISettingsService _settingsService;
@@ -22,7 +24,7 @@ namespace eShopOnContainers.ViewModels
         private bool _isSubmittedOrder;
         private string _orderStatusText;
 
-        private int? _orderNumber;
+        public int OrderNumber { get; set; }
 
         public Order Order
         {
@@ -55,27 +57,17 @@ namespace eShopOnContainers.ViewModels
             ToggleCancelOrderCommand = new AsyncRelayCommand(ToggleCancelOrderAsync);
         }
 
-        public override void ApplyQueryAttributes(IDictionary<string, object> query)
-        {
-            base.ApplyQueryAttributes(query);
-
-            query.ValueAsInt(nameof(Order.OrderNumber), ref _orderNumber);
-        }
-
         public override async Task InitializeAsync ()
         {
-            if (_orderNumber.HasValue)
-            {
-                IsBusy = true;
-
-                // Get order detail info
-                var authToken = _settingsService.AuthAccessToken;
-                Order = await _appEnvironmentService.OrderService.GetOrderAsync (_orderNumber.Value, authToken);
-                IsSubmittedOrder = Order.OrderStatus == OrderStatus.Submitted;
-                OrderStatusText = Order.OrderStatus.ToString ().ToUpper ();
-
-                IsBusy = false;
-            }
+            await IsBusyFor(
+                async () =>
+                {
+                    // Get order detail info
+                    var authToken = _settingsService.AuthAccessToken;
+                    Order = await _appEnvironmentService.OrderService.GetOrderAsync (OrderNumber, authToken);
+                    IsSubmittedOrder = Order.OrderStatus == OrderStatus.Submitted;
+                    OrderStatusText = Order.OrderStatus.ToString ().ToUpper ();
+                });
         }
 
         private async Task ToggleCancelOrderAsync()

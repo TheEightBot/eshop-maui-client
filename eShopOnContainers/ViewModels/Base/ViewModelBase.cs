@@ -25,16 +25,10 @@ namespace eShopOnContainers.ViewModels.Base
             set => SetProperty(ref _isInitialized, value);
         }
 
-        public bool MultipleInitialization
-        {
-            get => _multipleInitialization;
-            set => SetProperty(ref _multipleInitialization, value);
-        }
-
         public bool IsBusy
         {
             get => _isBusy;
-            set => SetProperty(ref _isBusy, value);
+            private set => SetProperty(ref _isBusy, value);
         }
 
         public ViewModelBase(IDialogService dialogService, INavigationService navigationService, ISettingsService settingsService)

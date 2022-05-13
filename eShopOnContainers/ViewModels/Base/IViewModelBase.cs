@@ -10,11 +10,9 @@ namespace eShopOnContainers.ViewModels.Base
         public INavigationService NavigationService { get; }
         public ISettingsService SettingsService { get; }
 
+        public bool IsBusy { get; }
+
         public bool IsInitialized { get; set; }
-
-        public bool MultipleInitialization { get; set; }
-
-        public bool IsBusy { get; set; }
 
         Task InitializeAsync();
     }
