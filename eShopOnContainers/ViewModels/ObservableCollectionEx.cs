@@ -31,26 +31,42 @@ namespace eShopOnContainers.ViewModels
                 });
         }
 
+        // TODO: This will fix data reloading
+        //public void ReloadData(Action<IList<T>> innerListAction)
+        //{
+        //    Items.Clear();
+
+        //    innerListAction(Items);
+
+        //    this.OnPropertyChanged(new PropertyChangedEventArgs(nameof(Count)));
+        //    this.OnPropertyChanged(new PropertyChangedEventArgs("Items[]"));
+        //    this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+        //}
+
+        //public async Task ReloadDataAsync(Func<IList<T>, Task> innerListAction)
+        //{
+        //    Items.Clear();
+
+        //    await innerListAction(Items);
+
+        //    this.OnPropertyChanged(new PropertyChangedEventArgs(nameof(Count)));
+        //    this.OnPropertyChanged(new PropertyChangedEventArgs("Items[]"));
+        //    this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+        //}
+
+        //These are broken...
         public void ReloadData(Action<IList<T>> innerListAction)
         {
-            Items.Clear();
+            this.Clear();
 
-            innerListAction(Items);
-
-            this.OnPropertyChanged(new PropertyChangedEventArgs(nameof(Count)));
-            this.OnPropertyChanged(new PropertyChangedEventArgs("Items[]"));
-            this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+            innerListAction(this);
         }
 
-        public async Task ReloadDataAsync (Func<IList<T>, Task> innerListAction)
+        public async Task ReloadDataAsync(Func<IList<T>, Task> innerListAction)
         {
-            Items.Clear();
+            this.Clear();
 
-            await innerListAction(Items);
-
-            this.OnPropertyChanged(new PropertyChangedEventArgs(nameof(Count)));
-            this.OnPropertyChanged(new PropertyChangedEventArgs("Items[]"));
-            this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+            await innerListAction(this);
         }
     }
 }
