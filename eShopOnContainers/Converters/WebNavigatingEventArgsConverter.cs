@@ -5,6 +5,10 @@ namespace eShopOnContainers.Converters
 {
     public class WebNavigatingEventArgsConverter : ICommunityToolkitValueConverter
     {
+        public Type FromType => typeof(WebNavigatingEventArgs);
+
+        public Type ToType => typeof(string);
+
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             var eventArgs = value as WebNavigatingEventArgs;
