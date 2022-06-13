@@ -50,8 +50,8 @@ namespace eShopOnContainers.ViewModels
             get => _useAzureServices;
             set
             {
-                UpdateUseAzureServices();
                 SetProperty(ref _useAzureServices, value);
+                UpdateUseAzureServices();
             }
         }
 
@@ -204,6 +204,8 @@ namespace eShopOnContainers.ViewModels
             ToggleSendLocationCommand = new AsyncRelayCommand(ToggleSendLocationAsync);
 
             ToggleAllowGpsLocationCommand = new RelayCommand(ToggleAllowGpsLocation);
+
+            UseAzureServices = !_settingsService.UseMocks;
         }
 
         protected override async void OnPropertyChanged(PropertyChangedEventArgs e)
@@ -263,7 +265,7 @@ namespace eShopOnContainers.ViewModels
         private void UpdateUseAzureServices()
         {
             // Save use mocks services to local storage
-            _settingsService.UseMocks = !_useAzureServices;
+            _settingsService.UseMocks = !UseAzureServices;
         }
 
         private void UpdateIdentityEndpoint()
