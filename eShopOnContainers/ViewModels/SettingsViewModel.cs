@@ -76,8 +76,8 @@ namespace eShopOnContainers.ViewModels
             get => _useFakeLocation;
             set
             {
-                UpdateFakeLocation();
                 SetProperty(ref _useFakeLocation, value);
+                UpdateFakeLocation();
             }
         }
 
@@ -108,11 +108,11 @@ namespace eShopOnContainers.ViewModels
             get => _identityEndpoint;
             set
             {
+                SetProperty(ref _identityEndpoint, value);
                 if (!string.IsNullOrEmpty(value))
                 {
                     UpdateIdentityEndpoint();
                 }
-                SetProperty(ref _identityEndpoint, value);
             }
         }
 
@@ -121,11 +121,11 @@ namespace eShopOnContainers.ViewModels
             get => _gatewayShoppingEndpoint;
             set
             {
+                SetProperty(ref _gatewayShoppingEndpoint, value);
                 if (!string.IsNullOrEmpty(value))
                 {
                     UpdateGatewayShoppingEndpoint();
                 }
-                SetProperty(ref _gatewayShoppingEndpoint, value);
             }
         }
 
@@ -134,11 +134,11 @@ namespace eShopOnContainers.ViewModels
             get => _gatewayMarketingEndpoint;
             set
             {
+                SetProperty(ref _gatewayMarketingEndpoint, value);
                 if (!string.IsNullOrEmpty(value))
                 {
                     UpdateGatewayMarketingEndpoint();
                 }
-                SetProperty(ref _gatewayMarketingEndpoint, value);
             }
         }
 
@@ -147,8 +147,8 @@ namespace eShopOnContainers.ViewModels
             get => _latitude;
             set
             {
-                UpdateLatitude();
                 SetProperty(ref _latitude, value);
+                UpdateLatitude();
             }
         }
 
@@ -157,8 +157,8 @@ namespace eShopOnContainers.ViewModels
             get => _longitude;
             set
             {
-                UpdateLongitude();
                 SetProperty(ref _longitude, value);
+                UpdateLongitude();
             }
         }
 
